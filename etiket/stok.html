@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stok Etiket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .etiket {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 0.1cm;
+            margin: 0.1cm;
+            text-align: left;
+            width: 5.3cm;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative; /* Sağ üst köşedeki etiketi konumlandırmak için */
+        }
+
+        .etiket h2 {
+                font-size: 1.1em;
+                margin: 0;
+                color: #000;
+				border-style: inherit;
+				border-width: 2px;
+            }
+
+        .etiket p {
+            font-size: 0.6em;
+            margin: 5px 0;
+        }
+
+        .etiket .firma {
+                font-weight: 800;
+                color: #17599c;
+				font-size:larger;
+            }
+        .etiket button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        .etiket button:hover {
+            background-color: #1e7e34;
+        }
+
+        .arama {
+            margin-bottom: 20px;
+        }
+
+        .arama input {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .arama button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .arama button:hover {
+            background-color: #0056b3;
+        }
+
+        .arama select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .etiket .qrcode {
+            position: absolute; /* Sağ üst köşede konumlandırmak için */
+            bottom: 10px;
+            right: 10px;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+            display: none;
+        }
+
+        .qrcode img {
+            width: 1.3cm;
+        }
+				.grid-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* PC için 3 sütun */
+    gap: 20px; /* Sütunlar arasındaki boşluk */
+}
+
+@media (max-width: 768px) {
+    .grid-container {
+        grid-template-columns: 1fr; /* Mobil için 1 sütun */
+    }
+}
+
+        /* Açılır pencere stili */
+        #popupMenu {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            text-align: center;
+        }
+
+        #popupMenu h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        #labelText {
+            width: 93%;
+            height: 120px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        #popupMenu button {
+            margin-top: 15px;
+            width: 48%;
+            font-size: 0.9rem;
+            background-color: #28a745;
+            transition: background-color 0.3s;
+        }
+
+        #popupMenu button:hover {
+            background-color: #218838;
+        }
+
+        #popupMenu button.close-btn {
+            background-color: #dc3545;
+        }
+
+        #popupMenu button.close-btn:hover {
+            background-color: #c82333;
+        }
+		
+		
+@media print {
+    /* Tüm yazdırma işlemlerinde geçerli temel ayarlar */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        color: #000000 !important; /* Mutlak siyah */
+        background: white !important;
+        font-weight: bold !important; /* Tüm metinler kalın */
+        -webkit-print-color-adjust: exact !important; /* Renklerin doğru çıkması için */
+        print-color-adjust: exact !important;
+        font-family: Arial, sans-serif !important; /* Okunaklı font */
+    }
+    
+    /* Etiket konteyneri */
+    .etiket {
+        width: 5.5cm !important;
+        height: 4cm !important;
+        margin: 0 !important;
+        padding: 2px !important;
+        border: 2px solid #000 !important; /* Daha kalın kenarlık */
+        page-break-after: always !important; /* Her etiket yeni sayfada */
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+    
+    /* Metin içerikleri */
+    .label-content {
+        color: #000000 !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        margin: 2px 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Firma adı stili */
+    .firma {
+        font-size: 14pt !important;
+        font-weight: bolder !important;
+        text-align: center !important;
+        margin-bottom: 3px !important;
+        color: #000 !important;
+    }
+    
+    /* Stok kodu stili */
+    .stok-kodu {
+        font-size: 16pt !important;
+        font-weight: bolder !important;
+        text-align: center !important;
+        margin: 3px 0 !important;
+    }
+    
+    /* Ürün adı stili */
+    .urun-adi {
+        font-size: 10pt !important;
+        height: 36px !important; /* Sabit yükseklik */
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important; /* Maksimum 2 satır */
+        -webkit-box-orient: vertical !important;
+        margin: 3px 0 !important;
+    }
+    
+    /* OEM kodu stili */
+    .oem-kodu {
+        font-size: 10pt !important;
+        margin: 3px 0 !important;
+    }
+    
+    /* Kenar çizgileri */
+    .border-element {
+        border: 2px solid #000000 !important; /* Daha kalın sınırlar */
+    }
+    
+    /* Barkod stilleri */
+    .barcode-container {
+        height: 25px !important;
+        width: 100% !important;
+        margin: 3px 0 !important;
+    }
+    
+    .barcode {
+        image-rendering: crisp-edges !important; /* Keskin kenarlar */
+        filter: contrast(140%) brightness(0%) !important; /* Daha koyu barkod */
+        height: 25px !important;
+        width: 100% !important;
+    }
+    
+    /* QR kod stilleri */
+    .qrcode {
+        width: 1.2cm !important;
+        height: 1.2cm !important;
+    }
+    
+    .qrcode img {
+        width: 100% !important;
+        height: 100% !important;
+        image-rendering: crisp-edges !important;
+        filter: contrast(140%) brightness(0%) !important; /* Daha koyu QR kod */
+    }
+    
+    /* Butonları yazdırmada gizle */
+    .no-print, .actions {
+        display: none !important;
+    }
+    
+    /* Yazdırma alanı optimizasyonu */
+    @page {
+        size: 5.5cm 4cm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+    </style>
+</head>
+<body>
+<div id="yukleniyorDiv" style="display:block" >Veriler Yükleniyor...</div>
+
+    <div id="aramaDiv" class="arama" style="display:none;">
+    <!-- Ana buton ve açılır pencere -->
+	<button style="background:red;" onclick="location.href='cari.html'">Cariler</button>
+    <button onclick="showPopup()">Etiket Yazdırma</button>
+
+    <div id="popupMenu">
+        <h3>Etiket Bilgilerini Girin</h3>
+		Her satır bir etiket... Etiket içi alt satıra geçmek için "," işareti kullanabilirsiniz
+        <textarea id="labelText" placeholder="Her satır bir etiket..."></textarea>
+        <button class="close-btn" onclick="closePopup()">Kapat</button>
+        <button onclick="printLabels()">Yazdır</button>
+		
+	<!-- <button onclick="openNewWindow()">Sipariş Stok Kod Ayır</button> -->
+	<button onclick="openNewWindow()">Soket Etiket</button>	
+
+    </div>
+        <input type="text" id="arama" name="arama" placeholder="Stok Kod, Stok Adı, Oem ile Ara" required>
+        <button type="submit" id="aramaButonu">Ara</button>
+		
+<button onclick="openstokWindow()">Stok Ekle</button>
+    </div>
+
+
+    <div id="etiketler" class="grid-container"></div>
+
+
+<div id="pagination"></div>
+
+</div>
+
+<script>
+    function openstokWindow() {
+        window.open('https://docs.google.com/spreadsheets/d/1W2o7Pr20xacId3n-76rawCdN-lkVuvkG7Nj5i00HHDw/edit?gid=365675946#gid=365675946', 'StokEkle', 'width=900,height=600,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=yes,left=50,top=100'); //Pencere boyutları
+    }
+</script>
+
+<script>
+    function openNewWindow() {
+        window.open('https://docs.google.com/spreadsheets/d/1IUTkfS0D0157tj8rM5GQsSO2nWjlrE-V16W_cYPRs48/edit?gid=1397439944#gid=1397439944', 'StokKodPenceresi', 'width=800,height=600'); // Pencere boyutları
+    }
+</script>
+
+
+
+
+<script>
+        // Açılır pencereyi gösterme/gizleme işlevleri
+        function showPopup() {
+            document.getElementById('popupMenu').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('popupMenu').style.display = 'none';
+        }
+
+// Yazdırma işlemi ve pencereyi kapatma
+function printLabels() {
+const labelContent = document.getElementById('labelText').value;
+    const labels = labelContent
+        .split('\n') // Her satır bir etiket
+        .map(line => line.trim())
+        .filter(line => line !== '') // Boş satırları filtrele
+        .map((line, index, array) => {
+            // Virgül (,) karakterini <br> ile değiştir
+            const formattedLine = line.split(',').map(part => part.trim()).join('<br>');
+            return `
+                <div class="etiket" style="${index < array.length - 1 ? 'page-break-after: always;' : ''}">
+                    <div class="etiket-icerik">${formattedLine}</div>
+                </div>`;
+        })
+        .join('');
+
+    if (labels === '') {
+        alert("Yazdırılacak bir etiket girin.");
+        return;
+    }
+
+
+    const printWindow = window.open('', '', 'width=800,height=600');
+
+    if (printWindow) {
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <style>
+                                            @page {
+                        size: 5.5cm 4cm; /* Kağıt boyutunu belirleme */
+                        margin: 0; /* Kenar boşluklarını ayarlama */
+                        padding: 0;
+                    }
+
+                    body {
+                        font-family: Arial, sans-serif;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        margin: 0;
+                        padding: 0;
+                    }
+                        .etiket {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-family: Arial, sans-serif;
+                            font-size: 1.1em;
+                            text-align: center;
+							margin: 0;
+							padding: 2px 3px;
+							background: #fff;
+							border: 1px solid #000; /* Kenar çizgilerini daha belirgin yap */
+							border-radius: 5px;
+							width: 5.20cm;
+							height: 3.80cm;
+							position: relative; /* Sağ üst köşedeki etiketi konumlandırmak için */
+							-webkit-print-color-adjust: exact;
+							print-color-adjust: exact;
+                    }
+
+
+                        .etiket-icerik {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 100%;
+                            height: 100%;
+                            padding: 0;
+                        }
+
+						
+						
+                    </style>
+                </head>
+                <body>${labels}</body>
+            </html>`);
+        
+        printWindow.document.close();
+        
+// Yazdırma işlemini başlat
+    printWindow.onload = function() {
+        printWindow.print();
+
+        // Yazdırma işleminden sonra 1 saniye bekleyip pencereyi kapat
+        setTimeout(() => {
+            printWindow.close();
+        }, 1000); // 1 saniye bekle (gerekirse süreyi artırabilirsiniz)
+    };
+    } else {
+        alert('Pop-up penceresi engellendi. Lütfen pop-up engelleyiciyi devre dışı bırakın.');
+    }
+}
+    </script>
+
+
+    <script>
+        const sheetId = '1W2o7Pr20xacId3n-76rawCdN-lkVuvkG7Nj5i00HHDw';
+        const apiKey = 'AIzaSyCQ_SmNuv0JxBBtaiSi7LGxPmeqOPygjYc';
+        const sheetName = 'SYSTEM';
+        const range = 'H2:O';
+		let rows = [];
+		const rowsPerPage = 20; // Number of rows to display per page
+		let currentPage = 1;
+
+		async function veriYukle() {
+			try {
+				const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetName}!${range}?key=${apiKey}`);
+				const data = await response.json();
+				rows = data.values || []; // Check for empty values
+
+				// Get search term from URL parameters
+				const urlParams = new URLSearchParams(window.location.search);
+				const aramaTerimi = urlParams.get('arama') || '';
+
+				document.getElementById('arama').value = aramaTerimi;
+				filtrele(aramaTerimi); // Filter data after loading
+				document.getElementById('aramaDiv').style.display = 'block';
+				document.getElementById('yukleniyorDiv').style.display = 'none';
+			} catch (error) {
+				console.error('An error occurred while loading data:', error);
+			}
+		}
+
+    function normalizeText(text) {
+        return text
+            .normalize('NFD') // Unicode normalization
+            .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+            .toLowerCase() // Convert to lowercase
+            .replace(/ç/g, 'c').replace(/Ç/g, 'C')
+            .replace(/ı/g, 'i').replace(/İ/g, 'I')
+            .replace(/ş/g, 's').replace(/Ş/g, 'S')
+            .replace(/ü/g, 'u').replace(/Ü/g, 'U')
+            .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+            .replace(/ğ/g, 'g').replace(/Ğ/g, 'G'); // Normalize Turkish characters
+    }
+
+function filtrele(aramaTerimi) {
+    const etiketlerDiv = document.getElementById('etiketler');
+    const paginationDiv = document.getElementById('pagination');
+
+    // Tüm içerikleri ve sonuç bulunamadı mesajını temizleyin
+    etiketlerDiv.innerHTML = '';
+    paginationDiv.innerHTML = '';
+
+    // Arama terimini normalize edin
+    const normalizedAramaTerimi = normalizeText(aramaTerimi);
+
+    // Eşleşen satırları toplayın
+    let matchingRows = [];
+    rows.forEach(row => {
+        if (!row) return; // Boş satırları geç
+        const [stok_kodu = '', gorunen_oem = '', tedarikci = '', baz_marka = '', grup_id = '', islem_bekleyen = '', tek_cift = '', urun_adi = ''] = row;
+
+        // Normalized değerlerle arama yapın
+        if (
+            normalizeText(stok_kodu).includes(normalizedAramaTerimi) ||
+            normalizeText(gorunen_oem).includes(normalizedAramaTerimi) ||
+            normalizeText(urun_adi).includes(normalizedAramaTerimi)
+        ) {
+            matchingRows.push(row);
+        }
+    });
+
+    // Sayfa başına düşen sonuçları ayarlayın
+    const totalRows = matchingRows.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    currentPage = 1; // Arama sonrası her zaman ilk sayfayı göster
+
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const currentRows = matchingRows.slice(startIndex, endIndex);
+
+    // Eşleşen verileri göster
+    if (currentRows.length > 0) {
+        currentRows.forEach(row => {
+            const [stok_kodu = '', gorunen_oem = '', tedarikci = '', baz_marka = '', grup_id = '', islem_bekleyen = '', tek_cift = '', urun_adi = ''] = row;
+
+            const etiketDiv = document.createElement('div');
+            etiketDiv.className = 'etiket';
+            etiketDiv.dataset.cariKod = stok_kodu;
+
+            etiketDiv.innerHTML = `
+                <div class="firma">YİĞİT OTOMOTİV</div>
+                <h2>${stok_kodu}</h2>
+                <p style="height: 26px;">${urun_adi}</p>
+                <p style="height: 24px;">${gorunen_oem}</p>
+                <div class="qrcode"><img src="https://barcode.tec-it.com/barcode.ashx?data=katalog.yigitotomotiv.com&code=QRCode&translate-esc=on&eclevel=L"/></div>
+                <button class="yazdir" onclick="etiketYazdir(event)">Yazdır</button>
+            `;
+
+            etiketlerDiv.appendChild(etiketDiv);
+        });
+    } else if (aramaTerimi) {
+        etiketlerDiv.innerHTML = '<div>Sonuç Bulunamadı</div>';
+    }
+
+    // Sayfa numaralandırmasını göster ve güncel sayfa içeriğini tekrar yükle
+    createPaginationControls(totalRows, totalPages);
+}
+
+
+    function createPaginationControls(totalRows, totalPages) {
+    const paginationDiv = document.getElementById('pagination');
+    paginationDiv.innerHTML = '';
+
+    // Create previous button
+    if (currentPage > 1) {
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Önceki';
+        prevButton.onclick = () => {
+            currentPage--;
+            filtrele(document.getElementById('arama').value);
+        };
+        paginationDiv.appendChild(prevButton);
+    }
+
+    // Display page numbers around the current page
+    for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        pageButton.onclick = () => {
+            currentPage = i;
+            filtrele(document.getElementById('arama').value);
+        };
+        if (i === currentPage) {
+            pageButton.disabled = true; // Disable current page button
+        }
+        paginationDiv.appendChild(pageButton);
+    }
+
+    // Create next button
+    if (currentPage < totalPages) {
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Sonraki';
+        nextButton.onclick = () => {
+            currentPage++;
+            filtrele(document.getElementById('arama').value);
+        };
+        paginationDiv.appendChild(nextButton);
+    }
+}
+
+    function aramaYap() {
+        const aramaTerimi = document.getElementById('arama').value;
+        filtrele(aramaTerimi);
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('arama', aramaTerimi);
+        window.history.pushState({}, '', `${window.location.pathname}?${urlParams}`);
+    }
+
+function etiketYazdir(event) {
+    const etiketDiv = event.target.closest('.etiket'); // Butonun bulunduğu etiketi bul
+    const firmaAdi = 'YİĞİT OTOMOTİV';
+    const stok_kodu = etiketDiv.querySelector('h2').textContent;
+    const urun_adi = etiketDiv.querySelector('p').textContent;
+    const gorunen_oem = etiketDiv.querySelector('p:nth-of-type(2)').textContent;
+
+    // Dinamik olarak bir yazdırma bölümü oluştur
+    const printContent = `
+        <!DOCTYPE html>
+        <html lang="tr">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Yazdır</title>
+                <style>
+                    @page {
+                        size: 5.5cm 4cm; /* Kağıt boyutunu belirleme */
+                        margin: 0; /* Kenar boşluklarını ayarlama */
+                        padding: 0;
+                    }
+
+                    body {
+                        font-family: Arial, sans-serif;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    .etiket {
+                        margin: 0;
+                        padding: 2px 3px;
+                        background: #fff;
+                        border: 1px solid #000; /* Kenar çizgilerini daha belirgin yap */
+                        border-radius: 5px;
+                        text-align: left;
+                        width: 5.20cm;
+                        height: 3.80cm;
+                        position: relative; /* Sağ üst köşedeki etiketi konumlandırmak için */
+                    }
+
+                    .etiket h2 {
+                        font-size: 1.1em;
+						margin: 0;
+						color: #000;
+						border-style: inherit;
+						border-width: 2px;
+                    }
+
+.etiket p {
+    font-size: 0.6em; /* Yazı boyutu */
+    height: 24px; /* Yükseklik */
+    padding: 0 1px; /* Kenar boşluğu */
+    color: #000; /* Yazı rengi */
+    overflow: hidden; /* Taşan içeriği gizle */
+    text-overflow: ellipsis; /* Taşan metin için üç nokta göster */
+}
+
+
+                    .etiket .firma {
+                        font-weight: 800;
+                        color: #000; /* Daha koyu renk */
+                        font-size: larger;
+                    }
+
+                    .etiket .qrcode {
+                        color: #000; /* Daha koyu renk */
+                        border-radius: 5px;
+                        font-size: 0.8em;
+                        font-weight: bold;
+                        padding: 3px;
+                    }
+
+                    .qrcode img {
+                        width: 1cm;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="etiket">
+                    <div class="firma">${firmaAdi}</div>
+                    <h2>${stok_kodu}</h2>
+                    <p style="height: 42px;margin: 2px;display: flex;">${urun_adi}</p>
+                    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+                        <p style="height: 21px;">${gorunen_oem}</p>
+                        <div class="qrcode"><img src="https://barcode.tec-it.com/barcode.ashx?data=katalog.yigitotomotiv.com&code=QRCode&translate-esc=on&eclevel=L"/></div>
+                    </div>
+                </div>
+            </body>
+       </html>
+    `;
+
+    // Yazdırma işlemi için içeriği oluştur
+    const printWindow = window.open('', '', 'width=800,height=800,scrollbars=no');
+
+    if (printWindow) {
+        printWindow.document.open();
+        printWindow.document.write(printContent);
+        printWindow.document.close(); // İçeriği kapat
+        printWindow.focus();
+
+// Yazdırma işlemini başlat
+    printWindow.onload = function() {
+        printWindow.print();
+
+        // Yazdırma işleminden sonra 1 saniye bekleyip pencereyi kapat
+        setTimeout(() => {
+            printWindow.close();
+        }, 1000); // 1 saniye bekle (gerekirse süreyi artırabilirsiniz)
+    };
+    } else {
+        alert('Pop-up penceresi engellendi. Lütfen pop-up engelleyiciyi devre dışı bırakın.');
+    }
+}
+
+// Sayfa yüklendiğinde verileri yükle ve filtrele
+veriYukle();
+
+// Arama butonuna tıklanıldığında arama yap
+document.getElementById('aramaButonu').addEventListener('click', aramaYap);
+
+// Arama teriminde değişiklik olursa anında arama yap
+document.getElementById('arama').addEventListener('input', () => {
+    // Butona tıklama olmadıkça arama yapılmasın
+});
+
+// Enter tuşuna basıldığında arama yap
+document.getElementById('arama').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        aramaYap();  // Enter'a basıldığında arama işlemini yap
+    }
+});
+    </script>
+</body>
+</html>

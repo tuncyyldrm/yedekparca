@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Kod Oluşturucu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-white transition-colors min-h-screen py-10 px-4">
+  <div class="max-w-3xl mx-auto space-y-6">
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl font-bold">QR Kod Oluşturucu</h1>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" id="themeToggle" class="form-checkbox w-4 h-4" />
+        <span class="text-sm">Koyu Tema</span>
+      </label>
+    </div>
+
+    <textarea id="qrInput" class="w-full p-3 border rounded-lg h-32 resize-y bg-white dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring focus:ring-blue-400"></textarea>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <div>
+        <label class="block mb-1">QR Renk:</label>
+        <input type="color" id="qrDarkColor" value="#000000" class="w-full h-10 border rounded bg-white dark:bg-gray-800 dark:border-gray-700" />
+      </div>
+      <div>
+        <label class="block mb-1">Arka Plan:</label>
+        <input type="color" id="qrLightColor" value="#ffffff" class="w-full h-10 border rounded bg-white dark:bg-gray-800 dark:border-gray-700" />
+      </div>
+      <div>
+        <label class="block mb-1">Boyut:</label>
+        <select id="qrSize" class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-700">
+          <option value="256">256x256</option>
+          <option value="384">384x384</option>
+          <option value="512">512x512</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="block mb-2">Logo Yükle (PNG/JPG):</label>
+      <input type="file" id="logoFile" accept="image/png, image/jpeg" class="w-full p-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-700" />
+    </div>
+
+    <div id="logoControls" class="flex items-center gap-4 mt-2 hidden">
+      <img id="logoPreview" class="w-20 h-20 object-contain rounded border" />
+      <button id="removeLogoBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">Logo Kaldır ✖️</button>
+    </div>
+
+    <div class="flex justify-center">
+      <canvas id="qrCanvas" class="mt-4 hidden border rounded shadow-md bg-white"></canvas>
+    </div>
+
+    <div id="infoMessage" class="text-center italic text-sm min-h-[1em]"></div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+      <button id="downloadBtn" disabled class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded disabled:opacity-50">⬇️ PNG İndir</button>
+      <button id="downloadSVGBtn" disabled class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded disabled:opacity-50">⬇️ SVG İndir</button>
+      <button id="copyBtn" disabled class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:opacity-50">📋 Kopyala</button>
+      <button id="clearBtn" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">🧼 Temizle</button>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mt-10 text-sm">
+      <h2 class="text-lg font-semibold mb-3 text-center">QR Kod Kullanım Örnekleri</h2>
+      <ul class="list-disc list-inside space-y-1">
+        <li><strong>Web adresi:</strong> <code>https://www.site.com</code></li>
+        <li><strong>Telefon:</strong> <code>tel:05312084897</code></li>
+        <li><strong>SMS:</strong> <code>sms:05312084897?body=Merhaba</code></li>
+        <li><strong>E-posta:</strong> <code>mailto:ornek@mail.com?subject=Konu&body=Mesaj</code></li>
+        <li><strong>Wi-Fi:</strong> <code>WIFI:S:SSID;T:WPA;P:şifre;;</code></li>
+        <li><strong>Metin:</strong> Özgürce yazabilirsiniz.</li>
+        <li><strong>Konum:</strong> <code>geo:37.7749,-122.4194</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("qrInput");
+    const canvas = document.getElementById("qrCanvas");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const downloadSVGBtn = document.getElementById("downloadSVGBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const qrDarkColor = document.getElementById("qrDarkColor");
+    const qrLightColor = document.getElementById("qrLightColor");
+    const qrSize = document.getElementById("qrSize");
+    const themeToggle = document.getElementById("themeToggle");
+    const logoFile = document.getElementById("logoFile");
+    const logoPreview = document.getElementById("logoPreview");
+    const logoControls = document.getElementById("logoControls");
+    const removeLogoBtn = document.getElementById("removeLogoBtn");
+    const infoMessage = document.getElementById("infoMessage");
+
+    let logoImage = null;
+    let qrTimeout;
+
+    function showMessage(text, isError = false) {
+      infoMessage.textContent = text;
+      infoMessage.className = isError
+        ? "text-center italic text-sm text-red-500"
+        : "text-center italic text-sm text-green-500";
+    }
+
+    function generateQR() {
+      const value = input.value.trim();
+      if (!value) {
+        canvas.style.display = "none";
+        downloadBtn.disabled = true;
+        downloadSVGBtn.disabled = true;
+        copyBtn.disabled = true;
+        showMessage("Lütfen QR kod oluşturmak için bir içerik girin.", true);
+        return;
+      }
+
+      const size = parseInt(qrSize.value);
+      const tempCanvas = document.createElement("canvas");
+
+      QRCode.toCanvas(tempCanvas, value, {
+        width: size,
+        margin: 2,
+        color: { dark: qrDarkColor.value, light: qrLightColor.value },
+        errorCorrectionLevel: 'H',
+      }, function (err) {
+        if (err) {
+          console.error(err);
+          showMessage("QR kod oluşturulurken bir hata oluştu.", true);
+          return;
+        }
+
+        const ctx = canvas.getContext("2d");
+        canvas.width = size;
+        canvas.height = size;
+        ctx.clearRect(0, 0, size, size);
+        ctx.drawImage(tempCanvas, 0, 0);
+
+        if (logoImage) {
+          const logoSize = size * 0.2;
+          const x = (size - logoSize) / 2;
+          const y = (size - logoSize) / 2;
+          ctx.save();
+          ctx.fillStyle = qrLightColor.value || '#fff';
+          ctx.beginPath();
+          ctx.arc(x + logoSize / 2, y + logoSize / 2, logoSize / 2 + 5, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.restore();
+          ctx.drawImage(logoImage, x, y, logoSize, logoSize);
+        }
+
+        canvas.style.display = "block";
+        downloadBtn.disabled = false;
+        downloadSVGBtn.disabled = false;
+        copyBtn.disabled = false;
+        showMessage("QR kod oluşturuldu.");
+      });
+    }
+
+    function debounceGenerateQR() {
+      clearTimeout(qrTimeout);
+      qrTimeout = setTimeout(generateQR, 300);
+    }
+
+    function downloadSVG() {
+      const value = input.value.trim();
+      if (!value) return;
+
+      const size = parseInt(qrSize.value);
+      const dark = qrDarkColor.value;
+      const light = qrLightColor.value;
+
+      const qr = QRCode.create(value, { errorCorrectionLevel: 'H' });
+      const moduleCount = qr.modules.size;
+      const cellSize = size / moduleCount;
+
+      let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" shape-rendering="crispEdges" viewBox="0 0 ${size} ${size}">`;
+      svg += `<rect width="100%" height="100%" fill="${light}"/>`;
+
+      for (let row = 0; row < moduleCount; row++) {
+        for (let col = 0; col < moduleCount; col++) {
+          if (qr.modules.get(row, col)) {
+            svg += `<rect x="${col * cellSize}" y="${row * cellSize}" width="${cellSize}" height="${cellSize}" fill="${dark}"/>`;
+          }
+        }
+      }
+
+      if (logoImage) {
+        const logoSize = size * 0.2;
+        const tmpCanvas = document.createElement('canvas');
+        tmpCanvas.width = logoImage.width;
+        tmpCanvas.height = logoImage.height;
+        tmpCanvas.getContext('2d').drawImage(logoImage, 0, 0);
+        const logoDataURL = tmpCanvas.toDataURL();
+
+        svg += `<circle cx="${size/2}" cy="${size/2}" r="${(logoSize/2)+5}" fill="${light}"/>`;
+        svg += `<image href="${logoDataURL}" x="${(size - logoSize) / 2}" y="${(size - logoSize) / 2}" width="${logoSize}" height="${logoSize}" />`;
+      }
+
+      svg += '</svg>';
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'qr-kod.svg';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Event Listeners
+    input.addEventListener("input", debounceGenerateQR);
+    qrDarkColor.addEventListener("input", debounceGenerateQR);
+    qrLightColor.addEventListener("input", debounceGenerateQR);
+    qrSize.addEventListener("change", debounceGenerateQR);
+
+    logoFile.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) { logoImage = null; logoControls.style.display = "none"; generateQR(); return; }
+      if (!file.type.startsWith("image/")) { showMessage("Lütfen geçerli bir resim dosyası seçin.", true); return; }
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        logoPreview.src = evt.target.result;
+        logoControls.style.display = "flex";
+        logoImage = new Image();
+        logoImage.onload = generateQR;
+        logoImage.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    removeLogoBtn.addEventListener("click", () => {
+      logoImage = null;
+      logoFile.value = "";
+      logoControls.style.display = "none";
+      generateQR();
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = "qr-kod.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+
+    downloadSVGBtn.addEventListener("click", downloadSVG);
+
+    copyBtn.addEventListener("click", async () => {
+      try {
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        showMessage("QR kod panoya kopyalandı!");
+      } catch {
+        showMessage("Kopyalama başarısız oldu.", true);
+      }
+    });
+
+    clearBtn.addEventListener("click", () => {
+      input.value = "";
+      logoFile.value = "";
+      logoControls.style.display = "none";
+      logoImage = null;
+      canvas.style.display = "none";
+      downloadBtn.disabled = true;
+      downloadSVGBtn.disabled = true;
+      copyBtn.disabled = true;
+      showMessage("");
+    });
+
+    function setTheme(dark) {
+      if (dark) {
+        document.documentElement.classList.add('dark');
+        themeToggle.checked = true;
+      } else {
+        document.documentElement.classList.remove('dark');
+        themeToggle.checked = false;
+      }
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+    }
+
+    themeToggle.addEventListener('change', () => setTheme(themeToggle.checked));
+
+    const savedTheme = localStorage.getItem('theme');
+    setTheme(savedTheme === 'dark');
+  </script>
+</body>
+</html>

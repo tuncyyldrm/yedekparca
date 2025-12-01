@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cari Etiket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .etiket {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            margin: 5px;
+            text-align: left;
+            width: 94%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative; /* Sağ üst köşedeki etiketi konumlandırmak için */
+        }
+
+        .etiket h2 {
+            font-size: 1em;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .etiket p {
+            font-size: 0.9em;
+            margin: 5px 0;
+			
+        }
+
+        .etiket .firma {
+            font-weight: bold;
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        .etiket .odeme-turu {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			background-color: red;
+			color: #fff;
+			padding: 0px 10px;
+			border-radius: 5px;
+			font-weight: 800;
+			font-size: 18px;
+		}
+
+        .etiket button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        .etiket button:hover {
+            background-color: #1e7e34;
+        }
+
+        .arama {
+            margin-bottom: 20px;
+        }
+
+        .arama input {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .arama button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .arama button:hover {
+            background-color: #0056b3;
+        }
+
+        .arama select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+		
+				.etiket .qrcode{
+            position: absolute; /* Sağ üst köşede konumlandırmak için */
+            bottom: 10px;
+            right: 10px;
+            color: #fff;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+			display:none;
+		}
+		
+		
+		.qrcode img{width:1.3cm;}
+		
+		        .sayfalama {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .sayfalama button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .sayfalama button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+		
+		.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* PC için 3 sütun */
+    gap: 20px; /* Sütunlar arasındaki boşluk */
+}
+
+@media (max-width: 768px) {
+    .grid-container {
+        grid-template-columns: 1fr; /* Mobil için 1 sütun */
+    }
+}
+
+
+
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Açılır pencere stili */
+        #popupMenu {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            text-align: center;
+        }
+
+        #popupMenu h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        #labelText {
+            width: 93%;
+            height: 120px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        #popupMenu button {
+            margin-top: 15px;
+            width: 48%;
+            font-size: 0.9rem;
+            background-color: #28a745;
+            transition: background-color 0.3s;
+        }
+
+        #popupMenu button:hover {
+            background-color: #218838;
+        }
+
+        #popupMenu button.close-btn {
+            background-color: #dc3545;
+        }
+
+        #popupMenu button.close-btn:hover {
+            background-color: #c82333;
+        }
+		
+		.kargoicdiv	{
+		display: grid;grid-template-columns: repeat(2, 50%);
+		}
+		
+		@media print {
+    body {
+        color: #000000;
+        font-weight: bold;
+    }
+    .label-content {
+        color: #000000; /* Metin için koyu renk */
+        font-weight: bold; /* Kalın yazı */
+    }
+    .border-element {
+        border: 2px solid #000000; /* Koyu sınırlar */
+    }
+}
+
+    </style>
+</head>
+<body>
+<div id="yukleniyorDiv" style="display:block" >Veriler Yükleniyor...</div>
+    <div id="aramaDiv" class="arama" style="display:none;" >
+    <!-- Ana buton ve açılır pencere -->
+	<button style="background:red;" onclick="location.href='stok.html'">Stoklar</button>
+    <button onclick="showPopup()">Etiket Yazdırma</button>
+
+    <div id="popupMenu" style="display: none;">
+        <h3>Etiket Bilgilerini Girin</h3>        
+        <!-- Ek alanlar -->
+        <input type="text" id="caridi" placeholder="Alıcı Adı">
+                <select id="odemeTuru">
+            <option value="">Ödeme Türünü Seçin</option>
+            <option value="ÜA">ÜA</option>
+            <option value="PÖ">PÖ</option>
+        </select>
+        <textarea id="labelText" placeholder="Ayrıntılı Adres..."></textarea>
+        <input type="text" id="ililce" placeholder="İlçe/İl">
+        <input type="text" id="telefon" placeholder="Telefon Numarası">
+         <div>
+        <button class="close-btn" onclick="closePopup()">Kapat</button>
+        <button onclick="printLabels()">Yazdır</button>
+		 </div>
+    </div>
+        <input type="text" id="arama" placeholder="Cari Kod, Cari Adı, Adres, Telefon Numarası ile Ara">
+    </div>
+    <div id="etiketler" class="grid-container"></div>
+	<div class="sayfalama" id="sayfalama"></div>
+	
+<script>
+// Açılır pencereyi gösterme/gizleme işlevleri
+function showPopup() {
+    document.getElementById('popupMenu').style.display = 'block';
+}
+
+function closePopup() {
+    document.getElementById('popupMenu').style.display = 'none';
+}
+
+// Yazdırma işlemi ve pencereyi kapatma
+function printLabels() {
+    // Kullanıcıdan etiket içeriğini al
+    const labelContent = document.getElementById('labelText').value.toUpperCase();
+    const odemeTuru = document.getElementById('odemeTuru').value.toUpperCase();
+    const caridi = document.getElementById('caridi').value.toUpperCase();
+    const ililce = document.getElementById('ililce').value.toUpperCase();
+    const telefon = document.getElementById('telefon').value.toUpperCase();
+    // Ödeme türü seçilmedi ise kullanıcıyı uyar
+    if (odemeTuru === '') {
+        alert("Ödeme türü boş olamaz. Lütfen bir ödeme türü seçin.");
+        return;
+    }
+    if (caridi === '') {
+        alert("Alıcı adı eksik.");
+        return;
+    }
+    if (ililce === '') {
+        alert("İlçe/İl eksik.");
+        return;
+    }
+    if (telefon === '') {
+        alert("Alıcı telefon numarası eksik.");
+        return;
+    }
+    // İçeriği satırlarına göre ayır, boş satırları filtrele ve etiket yapısını oluştur
+    const labels = labelContent
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line !== '') // Boş satırları filtrele
+        .map(line => `
+            <div class="etiket-icerik">${line}</div>`)
+        .join('');
+
+    // Eğer etiket yoksa kullanıcıyı uyar
+    if (labels === '') {
+        alert("Yazdırılacak bir etiket girin.");
+        return;
+    }
+
+    // Yazdırma penceresini aç
+    const printWindow = window.open('', '', 'width=800,height=600');
+
+    if (printWindow) {
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="tr">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Yazdır</title>
+                    <style>
+                        @page {
+                            size: 10cm 29cm; /* Kağıt boyutunu belirleme */
+                            margin: 0; /* Kenar boşluklarını ayarlama */
+                        }
+                        
+                        body {
+                            font-family: Arial, sans-serif;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                        }
+
+                        .etiket {
+                            background: #fff;
+                            border: 1px solid #ddd;
+                            border-radius: 5px;
+                            padding: 15px;
+                            margin: 10px;
+                            text-align: left;
+                            width: 8cm;
+                            position: relative; /* Sağ üst köşedeki etiketi konumlandırmak için */
+                        }
+
+                        .etiket h2 {
+                            font-size: 1.2em;
+                            margin: 10px 0;
+                            color: #333;
+                        }
+
+                        .etiket p {
+                            font-size: 0.9em;
+                            margin: 5px 0;
+                        }
+
+                        .etiket .firma {
+                            font-weight: bold;
+                            color: red;
+                            margin-bottom: 10px;
+                        }
+
+						.etiket .odeme-turu {
+							position: absolute;
+							top: 10px;
+							right: 10px;
+							background-color: red;
+							color: #fff;
+							padding: 0px 10px;
+							border-radius: 5px;
+							font-weight: 800;
+							font-size: 18px;
+						}
+
+                        .etiket .qrcode {
+                            position: absolute; /* Sağ alt köşede konumlandırmak için */
+                            bottom: 10px;
+                            right: 10px;
+                            color: #fff;
+                            border-radius: 5px;
+                            font-size: 0.8em;
+                            font-weight: bold;
+                        }
+
+                        .qrcode img { width: 1.3cm; }
+                    </style>
+                </head>
+                <body>
+                    <div class="etiket">
+                        <div class="odeme-turu">${odemeTuru}</div>
+                        <div class="firma">YİĞİT ELEKTROMEKANİK</div>
+                        <h2>${caridi}</h2>
+                        <p>${labels}</p>
+                        <p>${ililce}</p>
+                        <p>TEL: ${telefon}</p>
+                        <div class="qrcode"><img src="https://barcode.tec-it.com/barcode.ashx?data=katalog.yigitotomotiv.com&amp;code=QRCode&amp;translate-esc=on&amp;eclevel=L" alt="QR Code"></div>
+                    </div>
+                </body>
+            </html>`);
+        
+        printWindow.document.close();
+        
+        // Yazdırma işlemini başlat
+    printWindow.onload = function() {
+        printWindow.print();
+
+        // Yazdırma işleminden sonra 1 saniye bekleyip pencereyi kapat
+        setTimeout(() => {
+            printWindow.close();
+        }, 1000); // 1 saniye bekle (gerekirse süreyi artırabilirsiniz)
+    };
+    } else {
+        alert('Pop-up penceresi engellendi. Lütfen pop-up engelleyiciyi devre dışı bırakın.');
+    }
+}
+</script>
+	
+	
+	
+	
+	
+    <script>
+const sheetId1 = '1yzee6VpQWzoznwce2T7eFmPMniULr1Hy6LDQuaOozps';
+const sheetId2 = '1uZz_k2FuktVdyZkpQsRTz4B-S05YoE14X-TbnOYl7o4';
+const apiKey = 'AIzaSyCQ_SmNuv0JxBBtaiSi7LGxPmeqOPygjYc';
+const sheetName1 = 'NETSİS';
+const sheetName2 = 'Main';
+const range1 = 'A3:I';
+const range2 = 'A2:C';
+let rows1 = [];
+let rows2 = [];
+    const pageSize = 30; // Sayfa başına gösterilecek etiket sayısı
+    let currentPage = 1; // Mevcut sayfa
+
+async function veriYukle() {
+    document.getElementById('yukleniyorDiv').style.display = 'block'; // Yükleniyor göstergesini aç
+    try {
+        const [data1, data2] = await Promise.all([
+            fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId1}/values/${sheetName1}!${range1}?key=${apiKey}`).then(response => response.json()),
+            fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId2}/values/${sheetName2}!${range2}?key=${apiKey}`).then(response => response.json())
+        ]);
+        rows1 = data1.values || [];
+        rows2 = data2.values || [];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const aramaTerimi = urlParams.get('arama') || '';
+        document.getElementById('arama').value = aramaTerimi;
+        document.getElementById('aramaDiv').style.display = 'block';
+        document.getElementById('yukleniyorDiv').style.display = 'none';
+
+        filtrele(aramaTerimi);
+    } catch (error) {
+        console.error('Veri yüklenirken bir hata oluştu:', error);
+    }
+}
+
+function normalizeText(text) {
+    return text
+        ? text
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/ç/g, 'c').replace(/Ç/g, 'C')
+            .replace(/ı/g, 'i').replace(/İ/g, 'I')
+            .replace(/ş/g, 's').replace(/Ş/g, 'S')
+            .replace(/ü/g, 'u').replace(/Ü/g, 'U')
+            .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+            .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
+        : '';
+}
+
+function aramaYap() {
+    const aramaInput = document.getElementById('arama');
+    const aramaTerimi = aramaInput.value.trim(); // Boşlukları temizle
+
+    // Filtreleme işlemini yap
+    filtrele(aramaTerimi);
+    
+    // URL'yi güncelle
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('arama', encodeURIComponent(aramaTerimi)); // Arama terimini URL'de güvenli hale getir
+    window.history.pushState({}, '', `${window.location.pathname}?${urlParams}`);
+    
+    // Arama çubuğunu temizle veya odaklanma (isteğe bağlı)
+    // aramaInput.value = ''; // Arama çubuğunu temizler
+    // aramaInput.focus(); // Arama çubuğuna odaklanır
+}
+
+function urlParamArama() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const aramaTerimi = urlParams.get('arama') || '';
+    document.getElementById('arama').value = aramaTerimi;
+    filtrele(aramaTerimi);
+}
+
+    function filtrele(aramaTerimi) {
+        const etiketlerDiv = document.getElementById('etiketler');
+        const sayfalamaDiv = document.getElementById('sayfalama');
+        etiketlerDiv.innerHTML = '';
+        sayfalamaDiv.innerHTML = '';
+
+    const normalizedAramaTerimleri = aramaTerimi
+        .split(' ')
+        .map(term => normalizeText(term))
+        .filter(term => term.length > 0);
+
+    let matchingRows = [];
+
+    // rows1'deki verileri kullanarak eşleşmeleri kontrol et
+    rows1.forEach(row1 => {
+        if (!row1) return;
+        const [cari_kod1 = '', cari_ad1 = '', cari_adres1 = '', cari_ilçe1 = '', cari_il1 = '', cari_tel_1 = '', cari_tel_2 = '', plasiyer1 = '', grup1 = ''] = row1;
+
+        // rows2'de cari kodu eşleşenleri bul
+        const row2 = rows2.find(row2 => row2[0] === cari_kod1);
+        if (row2) {
+            const [cari_kod2 = '', b2b = '', sifre = ''] = row2;
+            matchingRows.push([...row1, b2b, sifre]);
+        } else {
+			matchingRows.push([...row1, `<span style='color: red;'>Kayıt Yok</span>`, `<span style='color: red;'>(Giriş Bilgileri Oluşturulmamış)</span>`]);
+		}
+    });
+
+    // Arama terimlerine göre filtreleme yap
+    matchingRows = matchingRows.filter(row => {
+        const [cari_kod, cari_ad, cari_adres, cari_ilçe, cari_il, cari_tel_1, cari_tel_2, plasiyer, grup, b2b, sifre] = row;
+
+        // Cari kod için tam eşleşme kontrolü
+        if (normalizeText(cari_kod).includes(normalizeText(aramaTerimi))) {
+            return true;
+        }
+
+        // Diğer alanlar için normal filtreleme
+        const searchFields = [cari_ad, cari_adres, cari_ilçe, cari_il, cari_tel_1, cari_tel_2, plasiyer, grup, b2b, sifre];
+        return searchFields.some(field => normalizeText(field).includes(normalizeText(aramaTerimi)));
+    });
+
+
+        const totalPages = Math.ceil(matchingRows.length / pageSize);
+        const startRow = (currentPage - 1) * pageSize;
+        const endRow = Math.min(startRow + pageSize, matchingRows.length);
+        
+	for (let i = startRow; i < endRow; i++) {
+			const row = matchingRows[i];
+			const [cari_kod, cari_ad, cari_adres, cari_ilçe, cari_il, cari_tel_1, cari_tel_2, plasiyer, grup, b2b, sifre] = row;
+
+			const tel1NoSpaces = cari_tel_1 ? cari_tel_1.replace(/\s+/g, '') : '';
+			const tel2NoSpaces = cari_tel_2 ? cari_tel_2.replace(/\s+/g, '') : '';
+
+			// Varsayılan ve güvenli değer atama
+			const safeCariKod = cari_kod && cari_kod.trim() !== '' ? cari_kod : 'BELİRSİZ';
+			const safeTel1 = cari_tel_1 && cari_tel_1.trim() !== '' ? cari_tel_1 : '0000000000';
+			const safeTel2 = cari_tel_2 && cari_tel_2.trim() !== '' ? cari_tel_2 : '0000000000';
+
+			function escapeForJS(str) {
+				return (str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+			}
+
+			const etiketDiv = document.createElement('div');
+			etiketDiv.className = 'etiket';
+			etiketDiv.dataset.cariKod = cari_kod;
+
+			etiketDiv.innerHTML = `
+				<div>
+					<h2>${cari_ad}</h2>
+					<p>${cari_kod}</p>
+					<p>ADRES: <a target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(cari_adres + ', ' + cari_ilçe + ', ' + cari_il)}">${cari_adres}</a></p>
+					<p>${cari_ilçe}/${cari_il}</p>
+					<p>TEL: <a href="https://wa.me/9${tel1NoSpaces}" target="_blank">${cari_tel_1}</a></p>
+					<div style="background:#c7c7c7;display:flex;flex-wrap: nowrap; justify-content: space-between; flex-direction: column;">
+						<p>TEL: <a href="https://wa.me/9${tel2NoSpaces}" target="_blank">${cari_tel_2}</a></p>
+						<p>${cari_kod}</p>
+						<p>${b2b}</p>
+						<p>${sifre}</p>
+						<div class="qrcode"><img src="https://barcode.tec-it.com/barcode.ashx?data=katalog.yigitotomotiv.com&code=QRCode&translate-esc=on&eclevel=L"/></div>
+						<div style="display:flex;">
+							<button style="margin:5px;" class="yazdir" onclick="etiketYazdir(event)">Yazdır</button>
+							<button style="margin:5px;background:blue;" class="yazdir" onclick="kargoTakipGonder(event, '${escapeForJS(safeCariKod)}', '${escapeForJS(safeTel1)}', '${escapeForJS(safeTel2)}')">Kargo</button>
+						</div>
+					</div>
+				</div>
+				<!-- Kargo Takip Modal -->
+				<div id="kargoModal" style="z-index: 1; display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
+					<div style="background-color: white; padding: 20px; border-radius: 5px; width: 300px;">
+						<h3>Kargo Takip</h3>
+						<div class="kargoicdiv" >Cari Kod: <span id="modalCariKod" ></span></div>
+						<div class="kargoicdiv" >TEL 1: <span id="modalTel1" ></span></div>
+						<div class="kargoicdiv" >TEL 2: <span id="modalTel2" ></span></div>
+						<div class="kargoicdiv" >
+						<label for="kargoFirma">Kargo Firması:</label>
+						<select id="kargoFirma">
+							<option value="Aras Kargo">Aras Kargo</option>
+							<option value="Sürat Kargo">Sürat Kargo</option>
+							<option value="Yurtiçi Kargo">Yurtiçi Kargo</option>
+						</select>
+						</div>
+						<div class="kargoicdiv" >
+						<label for="TelNo">Tel No:</label>
+						<input type="text" id="TelNo" placeholder="Tel numarası girin"/>
+						</div>
+						<div class="kargoicdiv" >
+						<label for="takipNo">Takip No:</label>
+						<input type="text" id="takipNo" placeholder="Takip numarası girin"/>
+						</div>
+						<div class="kargoicdiv" >
+						<button style="background:red;" onclick="closeModal()">İptal</button>
+						<button onclick="kargoTakipGonderConfirm()">Gönder</button>
+						</div>
+					</div>
+				</div>			
+			`;
+		etiketlerDiv.appendChild(etiketDiv);
+	}
+
+        // Sayfalama düğmelerini oluştur
+        if (totalPages > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.innerText = 'Önceki';
+            prevButton.disabled = currentPage === 1;
+            prevButton.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    filtrele(aramaTerimi); // Filtreleme fonksiyonunu tekrar çağır
+                }
+            };
+            sayfalamaDiv.appendChild(prevButton);
+
+            const nextButton = document.createElement('button');
+            nextButton.innerText = 'Sonraki';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.onclick = () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    filtrele(aramaTerimi); // Filtreleme fonksiyonunu tekrar çağır
+                }
+            };
+            sayfalamaDiv.appendChild(nextButton);
+        }
+    }
+
+// Sayfa yüklendiğinde verileri yükle ve filtrele
+window.addEventListener('load', () => {
+    veriYukle();
+    urlParamArama();
+});
+document.getElementById('arama').addEventListener('input', aramaYap);
+
+
+// Kargo Takip için Açılır Pencereyi Göster
+function kargoTakipGonder(event, cariKod, tel1, tel2) {
+    // Modalı göster
+    document.getElementById('kargoModal').style.display = 'flex';
+
+    // Cari bilgilerini güncelle
+    document.getElementById('modalCariKod').innerHTML = `${cariKod}`;
+    document.getElementById('modalTel1').innerHTML = tel1;
+    document.getElementById('modalTel1').href = `https://wa.me/9${tel1.replace(/\s+/g, '')}`;
+    document.getElementById('modalTel2').innerHTML = tel2;
+    document.getElementById('modalTel2').href = `https://wa.me/9${tel2.replace(/\s+/g, '')}`;
+}
+
+// Açılır Pencereyi Kapat
+function closeModal() {
+    document.getElementById("kargoModal").style.display = "none";
+}
+// Kargo Takip Bilgilerini Gönder
+function kargoTakipGonderConfirm() {
+    const kargoFirma = document.getElementById('kargoFirma').value;
+    const telNo = document.getElementById('TelNo').value.replace(/\s+/g, ''); // Telefon numarasındaki boşlukları kaldırır
+    const takipNo = document.getElementById('takipNo').value;
+
+    // Telefon numarası ve takip numarasının girilip girilmediğini kontrol et
+    if (!telNo || !takipNo) {
+        alert("Lütfen telefon ve takip numarasını giriniz.");
+        return;
+    }
+
+    // WhatsApp mesaj içeriği
+    const mesaj = `
+İyi günler
+*Yiğit Elektromekanik Isparta*
+Kargo firması: ${kargoFirma}
+Takip numarası: _${takipNo}_
+Detaylar için: https://kargomnerede.com.tr/tracking/${takipNo}`;
+
+    // WhatsApp URL'sini oluştur
+    const whatsappURL = `https://wa.me/9${telNo}?text=${encodeURIComponent(mesaj.trim())}`;
+
+    // WhatsApp'a yönlendirme
+    window.open(whatsappURL, '_blank');
+}
+
+
+function etiketYazdir(event) {
+    const etiketDiv = event.target.closest('.etiket'); // Butonun bulunduğu etiketi bul
+    const firmaAdi = 'YİĞİT ELEKTROMEKANİK';
+    const cariAdi = etiketDiv.querySelector('h2').textContent;
+    const cariKodu = etiketDiv.querySelector('p').textContent;
+    const adres = etiketDiv.querySelector('p:nth-of-type(2)').textContent.split('ADRES: ')[1];  // 2. paragrafın içeriğini al
+    const ililce = etiketDiv.querySelector('p:nth-of-type(3)').textContent;  // 3. paragrafın içeriğini al
+    const telefon = etiketDiv.querySelector('p:nth-of-type(4)').textContent.split('TEL: ')[1];  // 4. paragrafın içeriğini al
+    const qrcode = etiketDiv.querySelector('img').src;
+
+    // Modal pencereyi oluştur
+    const modalHTML = `
+        <div id="odemeTuruModal" style="display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999;">
+            <div style="background: #fff; padding: 20px; border-radius: 5px; text-align: center;">
+                <h2>Ödeme Türünü Seçin</h2>
+                <label><input type="radio" name="odemeTuru" value="ÜA" checked>Ücret Alıcı (ÜA)</label><br>
+                <label><input type="radio" name="odemeTuru" value="PÖ">Peşin Ödeme (PÖ)</label><br>
+                <button id="cancelOdemeTuru" style="margin-top: 10px; padding: 10px 20px; background-color: #dc3545; color: #fff; border: none; border-radius: 5px; cursor: pointer;">İptal Et</button>
+                <button id="submitOdemeTuru" style="margin-top: 10px; padding: 10px 20px; background-color: #28a745; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Seçimi Onayla</button>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Ödeme türünü seçtikten sonra modal pencereyi kapat ve yazdırma işlemini başlat
+    document.getElementById('submitOdemeTuru').addEventListener('click', () => {
+        const odemeTuru = document.querySelector('input[name="odemeTuru"]:checked').value;
+        const odemeTuruTextAbbr = odemeTuru === 'ÜA' ? 'ÜA' : 'PÖ';
+
+        // Dinamik olarak bir yazdırma bölümü oluştur
+        const printContent = `
+            <!DOCTYPE html>
+            <html lang="tr">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Yazdır</title>
+                    <style>
+                        @page {
+                            size: 10cm 29cm; /* Kağıt boyutunu belirleme */
+                            margin: 0; /* Kenar boşluklarını ayarlama */
+                        }
+                        
+                        body {
+                            font-family: Arial, sans-serif;
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                        }
+
+                        .etiket {
+                            background: #fff;
+                            border: 1px solid #ddd;
+                            border-radius: 5px;
+                            padding: 15px;
+                            margin: 10px;
+                            text-align: left;
+                            width: 8cm;
+                            position: relative; /* Sağ üst köşedeki etiketi konumlandırmak için */
+                        }
+
+                        .etiket h2 {
+                            font-size: 1.2em;
+                            margin: 10px 0;
+                            color: #333;
+                        }
+
+                        .etiket p {
+                            font-size: 0.9em;
+                            margin: 5px 0;
+                        }
+
+                        .etiket .firma {
+                            font-weight: bold;
+                            color: red;
+                            margin-bottom: 10px;
+                        }
+
+        .etiket .odeme-turu {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			background-color: red;
+			color: #fff;
+			padding: 0px 10px;
+			border-radius: 5px;
+			font-weight: 800;
+			font-size: 18px;
+		}
+
+                        .etiket .qrcode {
+                            position: absolute; /* Sağ alt köşede konumlandırmak için */
+                            bottom: 10px;
+                            right: 10px;
+                            color: #fff;
+                            border-radius: 5px;
+                            font-size: 0.8em;
+                            font-weight: bold;
+                        }
+
+                        .qrcode img { width: 1.3cm; }
+                    </style>
+                </head>
+                <body>
+                    <div class="etiket">
+                        <div class="odeme-turu">${odemeTuruTextAbbr}</div>
+                        <div class="firma">${firmaAdi}</div>
+                        <h2>${cariAdi}</h2>
+                        <p>ADRES: ${adres}</p>
+                        <p>${ililce}</p>
+                        <p>TEL: ${telefon}</p>
+                        <div class="qrcode"><img src="${qrcode}" alt="QR Code" /></div>
+                    </div>
+                </body>
+            </html>
+        `;
+
+        // Yazdırma işlemi için içeriği oluştur
+        const printWindow = window.open('', '', 'width=800,height=800,scrollbars=no');
+        
+        if (printWindow) {
+            printWindow.document.open();
+            printWindow.document.write(printContent);
+            printWindow.document.close(); // İçeriği kapat
+            printWindow.focus();
+
+// Yazdırma işlemini başlat
+    printWindow.onload = function() {
+        printWindow.print();
+
+        // Yazdırma işleminden sonra 1 saniye bekleyip pencereyi kapat
+        setTimeout(() => {
+            printWindow.close();
+        }, 1000); // 1 saniye bekle (gerekirse süreyi artırabilirsiniz)
+    };
+        } else {
+            alert('Pop-up penceresi engellendi. Lütfen pop-up engelleyiciyi devre dışı bırakın.');
+        }
+
+        // Modal pencereyi kapat
+        document.getElementById('odemeTuruModal').remove();
+    });
+
+    // Modal pencereyi kapat
+    document.getElementById('cancelOdemeTuru').addEventListener('click', () => {
+        document.getElementById('odemeTuruModal').remove();
+    });
+}
+
+    </script>
+</body>
+</html>
