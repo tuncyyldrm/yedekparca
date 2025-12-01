@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+	<link rel="icon" type="image/x-icon" href="/resim/yigit-oto/favicon.ico">
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3FW3CNT4XK"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3FW3CNT4XK');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Araca Özel Ampül Ara</title>
+<style>
+/* Genel Ayarlar */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #f9fafb;
+    color: #333;
+}
+
+/* Başlık */
+h1 {
+    text-align: center;
+    margin: 20px;
+    font-size: 24px;
+    color: #222;
+}
+
+/* Arama Kutusu */
+#searchInput {
+    width: 90%;
+    max-width: 400px;
+    padding: 10px;
+    margin: 0 auto 20px;
+    display: block;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Filtreleme Seçeneği */
+#filterBrand {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    background-color: #fff;
+    max-width: 400px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Ürün Listesi */
+#productList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 24px;
+}
+
+/* Ürün Kartı */
+.product-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    animation: fadeInUp 0.4s ease both;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.product-card h3 {
+    font-size: 18px;
+    margin: 0 0 10px;
+    color: #222;
+}
+
+.product-card p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Görsel */
+.brand-logo {
+    width: 100%;
+    height: auto;
+    max-height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+/* Bilgi Satırları */
+.info-grid {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    gap: 6px 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.info-grid i {
+    color: #007bff;
+    font-size: 16px;
+}
+
+.info-grid div {
+    display: flex;
+    align-items: center;
+}
+
+/* Butonlar */
+.product-card button {
+    padding: 10px 16px;
+    background: linear-gradient(to right, #007bff, #0056b3);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    align-self: flex-start;
+    margin-top: 12px;
+}
+
+.product-card button:hover {
+    background: linear-gradient(to right, #0056b3, #003d80);
+}
+
+/* Sayfa Navigasyonu */
+#pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+}
+
+#pagination button {
+    padding: 8px 14px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+#pagination button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+#pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#pageInfo {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Animasyon */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobil Uyum */
+@media (max-width: 768px) {
+    #productList {
+        padding: 16px;
+    }
+
+    .product-card {
+        padding: 14px;
+    }
+
+    .product-card h3 {
+        font-size: 16px;
+    }
+
+    .product-card p,
+    .product-card button {
+        font-size: 13px;
+    }
+
+    #pagination {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Başlık */
+    h1 {
+        font-size: 20px;
+    }
+}
+</style>
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+<div style="flex: 1;">
+    <h1>Araca Özel Ampül Ara</h1>
+    <input type="text" id="searchInput" placeholder="Ara..." oninput="searchProducts()">
+    <select id="filterBrand" onchange="filterProducts()">
+        <option value="">Tüm Markalar</option>
+    </select>
+<!-- Bu kısmı eski tablo yerine koy -->
+<div id="productList" class="product-list"></div>
+
+    <div id="pagination">
+        <button id="prevPageBtn">Önceki</button>
+        <span id="pageInfo"></span>
+        <button id="nextPageBtn">Sonraki</button>
+    </div>
+
+    <!-- Popup ve overlay -->
+    <div class="overlay" id="overlay" onclick="hideDetails()"></div>
+</div>
+
+<footer style="background-color: #333333;color: white;text-align: center;padding: 15px 0;position: relative;width: 100%;font-size: 14px;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
+  © 2022 - <span id="currentYear"></span> <a target="_blank" style="color: #ffcc00;" href="https://tuncyyldrm.vercel.app" >Tuncay YILDIRIM</a>
+</footer>
+
+<!-- JavaScript -->
+<script>
+  function toggleContactPopup() {
+    const popup = document.getElementById("contact-popup");
+    popup.style.display = (popup.style.display === "none" ? "block" : "none");
+  }
+
+  // Dinamik olarak güncel yılı gösterme
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+  // Service Worker kaydı
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/service-worker.js', { scope: '/' })
+      .then(() => console.log('Ana dizin için Service Worker kaydedildi.'))
+      .catch(err => console.error('Service Worker kaydı başarısız:', err));
+  }
+</script>
+    <script>
+const products = [];
+const productsPerPage = 12;
+let currentPage = 1;
+let currentFilterBrand = '';
+let currentSearchTerms = [];
+
+// Türkçe karakterleri sadeleştirme + küçük harfe çevirme
+function normalizeText(text) {
+    return (text || '')
+        .toString()
+        .toLowerCase()
+        .replace(/[çÇ]/g, 'c')
+        .replace(/[ğĞ]/g, 'g')
+        .replace(/[ıİ]/g, 'i')
+        .replace(/[öÖ]/g, 'o')
+        .replace(/[şŞ]/g, 's')
+        .replace(/[üÜ]/g, 'u')
+        .trim();
+}
+
+// Veri yükleme ve işleme
+fetch(`vt/ampulverisi.txt?t=${Date.now()}`)
+    .then(res => {
+        if (!res.ok) throw new Error('Veri dosyası yüklenemedi.');
+        return res.text();
+    })
+    .then(text => {
+        const data = parseCSV(text);
+        if (data.length < 3) return console.error("Yeterli veri bulunamadı.");
+
+        // Gerçek veri 3. satırdan itibaren başlıyor (0-index ile 2'den)
+        const rows = data.slice(2); 
+        const maxColumns = Math.max(...rows.map(r => r.length));
+        const brands = new Set();
+
+        rows.forEach((row, i) => {
+            while (row.length < maxColumns) row.push('');
+            const product = { originalRowId: i + 3 }; // Orijinal Excel satırı = 3. satırdan itibaren
+            row.forEach((cell, j) => product[`col${j + 1}`] = cell || '');
+            products.push(product);
+            if (row[0]) brands.add(row[0]);
+        });
+
+        populateFilterOptions('filterBrand', Array.from(brands));
+        applyUrlParams();
+        displayPage(Number(getUrlParam('page')) || 1);
+    })
+    .catch(err => console.error("Hata:", err));
+
+// Sekmeyle ayrılmış CSV çözümleyici
+function parseCSV(csvText) {
+    const lines = csvText.trim().split('\n');
+    return lines.map(line => line.split('\t').map(col => col.trim()));
+}
+
+// Filtre seçeneklerini doldur
+function populateFilterOptions(id, options) {
+    const select = document.getElementById(id);
+    options.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option;
+        opt.textContent = option;
+        select.appendChild(opt);
+    });
+}
+
+function getUrlParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+function applyUrlParams() {
+    const brandFromUrl = getUrlParam('brand');
+    const searchFromUrl = getUrlParam('search');
+
+    if (brandFromUrl) {
+        currentFilterBrand = brandFromUrl;
+        document.getElementById('filterBrand').value = brandFromUrl;
+    }
+
+    if (searchFromUrl) {
+        currentSearchTerms = normalizeText(searchFromUrl).split(' ').filter(Boolean);
+        document.getElementById('searchInput').value = searchFromUrl;
+    }
+}
+
+function displayPage(page) {
+    currentPage = page;
+
+    let filtered = getFilteredProducts(); // Burada filtrelenmiş ürünleri alıyoruz
+
+    // Sayfalama
+    const start = (currentPage - 1) * productsPerPage;
+    const paginated = filtered.slice(start, start + productsPerPage);
+
+    displayTable(paginated); // Filtrelenmiş ürünleri görüntüle
+    updatePaginationControls(filtered.length); // Sayfa numarası kontrollerini güncelle
+	window.scrollTo({ top: 0, behavior: 'smooth' });
+
+}
+
+
+function displayTable(items) {
+    const container = document.getElementById('productList');
+    container.innerHTML = '';
+
+    items.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+
+const image = document.createElement('img'); // Görsel oluşturuluyor
+
+// 42. sütundaki görsel URL'sini alıyoruz, eğer geçersizse veya boşsa varsayılan bir görsel kullanıyoruz
+const imageUrl = product[`col42`];
+image.src = (imageUrl && imageUrl !== '#N/A' && imageUrl.trim() !== '') 
+    ? imageUrl 
+    : `https://dummyimage.com/400x200/cccccc/000000&text=${encodeURIComponent(product.col1 + ' ' + product.col2)}`;
+
+image.alt = `${product.col1} ${product.col2}`;
+image.className = 'brand-logo';
+card.appendChild(image);
+
+        const title = document.createElement('h3');
+        title.textContent = `${product.col1} - ${product.col2}`;
+        card.appendChild(title);
+
+        const infoGrid = document.createElement('div');
+        infoGrid.className = 'info-grid';
+        infoGrid.innerHTML = `
+            <div style="display: flex;justify-content: center;"><i class="fas fa-car-side"></i> </div> <div>Gövde Şekli:</div><div>${product.col3}</div>
+            <div style="display: flex;justify-content: center;"><i class="far fa-calendar-alt"></i></div> <div>Ay/Yıl:</div><div>${product.col4}</div>
+            <div style="display: flex;justify-content: center;"><i class="fas fa-cogs"></i> </div> <div>Konfigürasyon:</div><div>${product.col5}</div>
+			
+			</div>
+        `;
+        card.appendChild(infoGrid);
+
+        const button = document.createElement('button');
+        button.textContent = 'Ayrıntı';
+        button.onclick = () => window.location.href = `ayrinti.html?id=${product.originalRowId}`;
+        card.appendChild(button);
+
+        container.appendChild(card);
+    });
+}
+
+document.getElementById('prevPageBtn').onclick = () => {
+    if (currentPage > 1) {
+        displayPage(currentPage - 1);
+        updateUrlParams();
+    }
+};
+
+document.getElementById('nextPageBtn').onclick = () => {
+    const total = products.length;
+    const filtered = getFilteredProducts();
+    if (currentPage < Math.ceil(filtered.length / productsPerPage)) {
+        displayPage(currentPage + 1);
+        updateUrlParams();
+    }
+};
+
+function getFilteredProducts() {
+    let result = [...products];
+
+    // Marka filtresi kontrolü (col1 = Marka sütunu)
+    if (currentFilterBrand) {
+        result = result.filter(product => normalizeText(product.col1) === normalizeText(currentFilterBrand));
+    }
+
+    if (currentSearchTerms.length > 0) {
+        const columnHeaders = [
+            "Araba", "Model", "Gövde Şekli", "Yıl", "Konfigürasyon Tekli / İkili", 
+            "Kısa Far", "Kısa Far 2", "Uzun Far", "Uzun Far 2", "HID Far", 
+            "Ön Sis Farı", "Ön Sis Farı 2", "Gündüz Farı", "Gündüz Farı 2", "Viraj Farı", 
+            "Viraj Farı 2", "Ön Park Lambası", "Ön Park Lambası 2", "Ön Sinyal", 
+            "Ön Sinyal 2", "Yan Sinyal", "Yan Sinyal 2", "Yüksek Seviye Fren Lambası", 
+            "Yüksek Seviye Fren Lambası 2", "Plaka Lambası", "Plaka Lambası 2", 
+            "Arka Sinyal", "Arka Sinyal 2", "Fren ve Kuyruk Lambası", 
+            "Fren ve Kuyruk Lambası 2", "Kuyruk Lambası", "Kuyruk Lambası 2", 
+            "Arka Sis Farı", "Arka Sis Farı 2", "Geri Vites Lambası", 
+            "Geri Vites Lambası 2", "İç Aydınlatma", "İç Aydınlatma 2", 
+            "İç Aydınlatma 3", "Panel Ampulü", "Panel Ampulü 2"
+        ];
+
+        const normalizedHeaders = columnHeaders.map(header => normalizeText(header));
+
+        result = result.filter(product => {
+            return currentSearchTerms.every(term => {
+                const normalizedTerm = normalizeText(term);
+
+                const headerMatch = normalizedHeaders.some((header, idx) => {
+                    if (header.includes(normalizedTerm)) {
+                        const field = `col${idx + 1}`;
+                        return product[field] && normalizeText(product[field]).length > 0;
+                    }
+                    return false;
+                });
+
+                const contentMatch = Object.keys(product).some(key =>
+                    key !== 'originalRowId' &&
+                    normalizeText(product[key]).includes(normalizedTerm)
+                );
+
+                const yearRangeMatch = (() => {
+                    const yearField = product.col4;
+                    let searchYear = parseInt(normalizedTerm);
+                    if (!yearField || isNaN(searchYear)) return false;
+
+                    if (searchYear > 1900) searchYear = searchYear % 100;
+
+                    const matches = yearField.match(/(\d{2})\/(\d{2})\s*-\s*(\d{2})?\/?(\d{2})?/);
+                    if (matches) {
+                        const normalizeYear = (yy) => {
+                            const year = parseInt(yy, 10);
+                            return year < 30 ? 2000 + year : 1900 + year;
+                        };
+
+                        const startYear = normalizeYear(matches[2]);
+                        const endYear = matches[4]
+                            ? normalizeYear(matches[4])
+                            : new Date().getFullYear();
+
+                        const fullSearchYear = normalizeYear(searchYear.toString().padStart(2, '0'));
+                        return fullSearchYear >= startYear && fullSearchYear <= endYear;
+                    }
+
+                    return false;
+                })();
+
+                return headerMatch || contentMatch || yearRangeMatch;
+            });
+        });
+    }
+
+    return result;
+}
+
+
+
+
+function updatePaginationControls(totalCount) {
+    const totalPages = Math.ceil(totalCount / productsPerPage);
+    document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${totalPages}`;
+    document.getElementById('prevPageBtn').disabled = currentPage === 1;
+    document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+}
+
+function searchProducts() {
+    const val = document.getElementById('searchInput').value;
+    currentSearchTerms = normalizeText(val).split(' ').filter(Boolean); // Girilen metni normalize et
+    displayPage(1); // Sayfayı 1. sayfaya resetle
+    updateUrlParams(); // URL parametrelerini güncelle
+}
+
+function filterProducts() {
+    currentFilterBrand = document.getElementById('filterBrand').value;
+    if (currentFilterBrand === 'Tümü') currentFilterBrand = '';
+    currentPage = 1;
+    displayPage(currentPage);
+    updateUrlParams();
+}
+
+function updateUrlParams() {
+    const url = new URL(window.location);
+    
+    if (currentSearchTerms.length) {
+        url.searchParams.set('search', currentSearchTerms.join(' '));
+    } else {
+        url.searchParams.delete('search');
+    }
+
+    if (currentFilterBrand && currentFilterBrand !== 'Tümü') {
+        url.searchParams.set('brand', currentFilterBrand);
+    } else {
+        url.searchParams.delete('brand');
+    }
+
+    url.searchParams.set('page', currentPage);
+    window.history.replaceState({}, '', url);
+}
+
+
+    </script>
+</body>
+</html>

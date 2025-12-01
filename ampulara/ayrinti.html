@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+	<link rel="icon" type="image/x-icon" href="/resim/yigit-oto/favicon.ico">
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3FW3CNT4XK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3FW3CNT4XK');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Araç Ayrıntı</title>
+  <style>
+  body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 10px;
+  background: #dcdcdc;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+h1 {
+    text-align: center;
+    color: #003399;
+    font-size: 100%;
+}
+.vehicle-container {
+list-style: none;
+    padding: 0;
+    display: grid;
+    justify-content: space-evenly;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 15px;
+}
+/* 650px ve altındaki ekran boyutları için tek sütun */
+@media (max-width: 650px) {
+    .vehicle-container {
+        grid-template-columns: 1fr; /* Tek sütun düzeni */
+    }
+}
+.vehicle-images {
+  position: relative;
+  width: 100%;
+}
+.vehicle-image {
+  width: 100%;
+  border-radius: 8px;
+}
+.hidden {
+  display: none;
+}
+.marker {
+    position: absolute;
+    width: 1.5vw;
+    height: 1.5vw;
+    background-color: rgba(0, 255, 0, 0.5);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+.marker:hover {
+  transform: scale(1.5);
+  background-color: rgba(0, 255, 0, 1);
+}
+/* Marker Pozisyonları */
+.front-sidelight { top: 37%; left: 45%; }
+.front-side-indicator { top: 26%; left: 23%; }
+.high-brake { top: 23%; left: 73%; }
+
+/* Bulb Listesi */
+.bulb-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    justify-content: space-evenly;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px 10px;
+}
+.bulb-list li {
+    cursor: pointer;
+    margin: 5px 0;
+    padding: 10px;
+    background: #e6e6e6;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+.bulb-list li:hover {
+  background: #d4d4d4;
+}
+.bulb-preview {
+    text-align: center;
+    background: white;
+    position: absolute;
+    right: 0;
+	display:none;
+}
+.bulb-preview img {
+    width: 50px;
+    height: auto;
+    border-radius: 8px;
+    margin: 10px;
+}
+
+
+/* Modal stilizasyonu */
+.modal {
+  display: none; /* Başlangıçta gizli */
+  position: fixed;
+  z-index: 1; /* En üstte görünmesini sağla */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2); /* Gri arka plan */
+  padding-top: 300px;
+  overflow: auto;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  top: 10px;
+  right: 25px;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+  </style>
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+<div style="flex: 1;">
+<div class="container">
+    <a href="javascript:history.back()">Geri</a>
+    <div style="display:flex;flex-direction: row;align-content: center;align-items: center;justify-content: space-between;">
+        <h1></h1>
+    </div>
+    <div id="loading-spinner" class="loading-spinner">Yükleniyor...</div> <!-- Loading Spinner -->
+    <div class="vehicle-container hidden">
+		<!-- Araç Görseli -->
+		<div class="vehicle-images">
+			<img id="front-image" src="front-car.jpg" alt="Front View" class="vehicle-image">
+			<img id="rear-image" src="rear-car.jpg" alt="Rear View" class="vehicle-image hidden">
+			<!-- İşaretler -->
+			<div class="marker front-dipped hidden" title="Headlamp Dipped Beam"></div>
+			<div class="marker front-main hidden" title="Headlamp Main Beam"></div>
+			<div class="marker front-indicator hidden" title="Front Indicator"></div>
+			<div class="marker front-fog hidden" title="Front Fog Light"></div>
+			<div class="marker front-sidelight hidden" title="Front Sidelight"></div>
+			<div class="marker front-interior hidden" title="Front Interior"></div> <!--Interior-->
+			<div class="marker front-panel hidden" title="Panel"></div> <!--Interior-->
+			<div class="marker front-side-indicator hidden" title="Side Indicator"></div>
+			<div class="marker high-brake hidden" title="High Level Brake Light"></div>
+			<div class="marker number-plate hidden" title="Number Plate Light"></div>
+			<div class="marker rear-brake hidden" title="Brake/Tail Light"></div>
+			<div class="marker rear-side hidden" title="Rear Side Light"></div>
+			<div class="marker rear-indicator hidden" title="Rear Indicator"></div>
+			<div class="marker rear-fog hidden" title="Rear Fog Light"></div>
+			<div class="marker reverse-light hidden" title="Reverse Light"></div>
+
+		</div>
+
+			<div class="bulb-preview">
+				<img id="bulb-image" src="" alt="Bulb Preview" class="hidden">
+			</div>
+			<!-- Ampül Listesi -->
+		<ul class="bulb-list">
+			<li data-position="front-dipped" data-bulb="bulb1.jpg">Kısa Far</li>
+			<li data-position="front-dipped" data-bulb="bulb1.jpg">Kısa Far 2</li>
+			<li data-position="front-main" data-bulb="bulb2.jpg">Uzun Far</li>
+			<li data-position="front-main" data-bulb="bulb2.jpg">Uzun Far 2</li>
+			<li data-position="front-main" data-bulb="bulb2.jpg">HID Far</li>
+			<li data-position="front-fog" data-bulb="bulb4.jpg">Ön Sis</li>
+			<li data-position="front-fog" data-bulb="bulb4.jpg">Ön Sis 2</li>
+			<li data-position="front-dipped" data-bulb="bulb4.jpg">Gündüz Farı</li>
+			<li data-position="front-dipped" data-bulb="bulb4.jpg">Gündüz Farı 2</li>
+			<li data-position="front-main" data-bulb="bulb4.jpg">Viraj Farı</li>
+			<li data-position="front-main" data-bulb="bulb4.jpg">Viraj Farı 2</li>
+			<li data-position="front-sidelight" data-bulb="bulb5.jpg">Ön Park</li>
+			<li data-position="front-sidelight" data-bulb="bulb5.jpg">Ön Park 2</li>
+			<li data-position="front-indicator" data-bulb="bulb3.jpg">Ön Sinyal</li>
+			<li data-position="front-indicator" data-bulb="bulb3.jpg">Ön Sinyal 2</li>
+			<li data-position="front-interior" data-bulb="bulb5.jpg">İç Aydınlatma</li> <!--Interior-->
+			<li data-position="front-interior" data-bulb="bulb5.jpg">İç Aydınlatma 2</li> <!--Interior-->
+			<li data-position="front-interior" data-bulb="bulb5.jpg">İç Aydınlatma 3</li> <!--Interior-->
+			<li data-position="front-panel" data-bulb="bulb5.jpg">Gösterge Paneli</li> <!--Interior-->
+			<li data-position="front-panel" data-bulb="bulb5.jpg">Gösterge Paneli 2</li> <!--Interior-->
+			<li data-position="front-side-indicator" data-bulb="bulb6.jpg">Yan Sinyal</li>
+			<li data-position="front-side-indicator" data-bulb="bulb6.jpg">Yan Sinyal 2</li>
+			<li data-position="high-brake" data-bulb="bulb7.jpg">Yüksek Fren</li>
+			<li data-position="high-brake" data-bulb="bulb7.jpg">Yüksek Fren 2</li>
+			<li data-position="number-plate" data-bulb="bulb8.jpg">Plaka Aydınlatma</li>
+			<li data-position="number-plate" data-bulb="bulb8.jpg">Plaka Aydınlatma 2</li>
+			<li data-position="rear-indicator" data-bulb="bulb11.jpg">Arka Sinyal</li>
+			<li data-position="rear-indicator" data-bulb="bulb11.jpg">Arka Sinyal 2</li>
+			<li data-position="rear-brake" data-bulb="bulb9.jpg">Fren/Arka Lamba</li>
+			<li data-position="rear-brake" data-bulb="bulb9.jpg">Fren/Arka Lamba 2</li>
+			<li data-position="rear-side" data-bulb="bulb10.jpg">Arka Park</li>
+			<li data-position="rear-side" data-bulb="bulb10.jpg">Arka Park 2</li>
+			<li data-position="rear-fog" data-bulb="bulb12.jpg">Arka Sis</li>
+			<li data-position="rear-fog" data-bulb="bulb12.jpg">Arka Sis 2</li>
+			<li data-position="reverse-light" data-bulb="bulb13.jpg">Geri Vites</li>
+			<li data-position="reverse-light" data-bulb="bulb13.jpg">Geri Vites 2</li>
+		</ul>
+    </div>
+</div>
+<!-- Modal for bulb preview -->
+<div id="bulb-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <img id="modal-bulb-image" src="" alt="Bulb Preview" class="modal-bulb-image">
+        <p id="modal-bulb-link"></p> <!-- Bu, URL linki gösterecek olan alan -->
+    </div>
+</div>
+</div>
+
+<footer style="background-color: #333333;color: white;text-align: center;padding: 15px 0;position: relative;width: 100%;font-size: 14px;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
+  © 2022 - <span id="currentYear"></span> <a target="_blank" style="color: #ffcc00;" href="https://tuncyyldrm.vercel.app" >Tuncay YILDIRIM</a>
+</footer>
+
+<!-- JavaScript -->
+<script>
+  function toggleContactPopup() {
+    const popup = document.getElementById("contact-popup");
+    popup.style.display = (popup.style.display === "none" ? "block" : "none");
+  }
+
+  // Dinamik olarak güncel yılı gösterme
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+  // Service Worker kaydı
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/service-worker.js', { scope: '/' })
+      .then(() => console.log('Ana dizin için Service Worker kaydedildi.'))
+      .catch(err => console.error('Service Worker kaydı başarısız:', err));
+  }
+</script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const id = getUrlParam('id'); // URL'den id parametresini al
+    if (!id) {
+        alert('Lütfen bir ID belirtin!');
+        return;
+    }
+    
+    // Loading spinner
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const vehicleContainer = document.querySelector('.vehicle-container');
+    
+    // CSV dosyasının yolunu belirle
+    const fileUrl = `vt/ampulverisi.txt?t=${Date.now()}`; // CSV dosyasının URL'sini buraya ekle
+    const lineIndex = Number(id) + 0; // İstenilen satırın indexini hesapla (id'nin 0-index olduğu varsayılır)
+    
+    fetch(fileUrl)
+        .then(response => response.text())
+        .then(data => {
+            console.log('Gelen Veri:', data); // Gelen tüm veriyi kontrol et
+            const rows = parseCSV(data);
+            if (rows.length < lineIndex) {
+                alert('Veri bulunamadı.');
+                return;
+            }
+            populatePage(rows[lineIndex - 1]); // İlgili satırı al
+            loadingSpinner.classList.add('hidden'); // Loading spinner'ı gizle
+            vehicleContainer.classList.remove('hidden'); // İçeriği göster
+        })
+        .catch(error => {
+            console.error('Veri yüklenirken hata:', error);
+            alert('Veri yüklenirken bir hata oluştu.');
+            loadingSpinner.classList.add('hidden'); // Loading spinner'ı gizle hata durumunda
+        });
+});
+
+
+// CSV çözümleyici fonksiyonu
+function parseCSV(csvText) {
+    const lines = csvText.trim().split('\n');
+    return lines.map(line => line.split('\t').map(col => col.trim()));
+}
+
+function getUrlParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+
+function populatePage(row) {
+    // Başlığı doldur
+    document.querySelector('h1').textContent = `${row[0] || 'Bilinmiyor'} - ${row[1] || 'Bilinmiyor'} - ${row[2] || 'Bilinmiyor'} - ${row[3] || 'Bilinmiyor'} - ${row[4] || 'Bilinmiyor'}`; // Araç adı ve modeli
+
+    // Ampül detayları ve görselleri (sütun sıralaması ile)
+    const bulbMapping = {
+        "Kısa Far": row[5] && row[5].trim() ? row[5] : '',
+        "Kısa Far 2": row[6] && row[6].trim() ? row[6] : '',
+        "Uzun Far": row[7] && row[7].trim() ? row[7] : '',
+        "Uzun Far 2": row[8] && row[8].trim() ? row[8] : '',
+        "HID Far": row[9] && row[9].trim() ? row[9] : '',
+        "Ön Sis": row[10] && row[10].trim() ? row[10] : '',
+        "Ön Sis 2": row[11] && row[11].trim() ? row[11] : '',
+        "Gündüz Farı": row[12] && row[12].trim() ? row[12] : '',
+        "Gündüz Farı 2": row[13] && row[13].trim() ? row[13] : '',
+        "Viraj Farı": row[14] && row[14].trim() ? row[14] : '',
+        "Viraj Farı 2": row[15] && row[15].trim() ? row[15] : '',
+        "Ön Park": row[16] && row[16].trim() ? row[16] : '',
+        "Ön Park 2": row[17] && row[17].trim() ? row[17] : '',
+        "Ön Sinyal": row[18] && row[18].trim() ? row[18] : '',
+        "Ön Sinyal 2": row[19] && row[19].trim() ? row[19] : '',
+        "İç Aydınlatma": row[36] && row[36].trim() ? row[36] : '',
+        "İç Aydınlatma 2": row[37] && row[37].trim() ? row[37] : '',
+        "İç Aydınlatma 3": row[38] && row[38].trim() ? row[38] : '',
+        "Gösterge Paneli": row[39] && row[39].trim() ? row[39] : '',
+        "Gösterge Paneli 2": row[40] && row[40].trim() ? row[40] : '',
+        "Yan Sinyal": row[20] && row[20].trim() ? row[20] : '',
+        "Yan Sinyal 2": row[21] && row[21].trim() ? row[21] : '',
+        "Yüksek Fren": row[22] && row[22].trim() ? row[22] : '',
+        "Yüksek Fren 2": row[23] && row[23].trim() ? row[23] : '',
+        "Plaka Aydınlatma": row[24] && row[24].trim() ? row[24] : '',
+        "Plaka Aydınlatma 2": row[25] && row[25].trim() ? row[25] : '',
+        "Arka Sinyal": row[26] && row[26].trim() ? row[26] : '',
+        "Arka Sinyal 2": row[27] && row[27].trim() ? row[27] : '',
+        "Fren/Arka Lamba": row[28] && row[28].trim() ? row[28] : '',
+        "Fren/Arka Lamba 2": row[29] && row[29].trim() ? row[29] : '',
+        "Arka Park": row[30] && row[30].trim() ? row[30] : '',
+        "Arka Park 2": row[31] && row[31].trim() ? row[31] : '',
+        "Arka Sis": row[32] && row[32].trim() ? row[32] : '',
+        "Arka Sis 2": row[33] && row[33].trim() ? row[33] : '',
+        "Geri Vites": row[34] && row[34].trim() ? row[34] : '',
+        "Geri Vites 2": row[35] && row[35].trim() ? row[35] : ''
+    };
+
+    // Listeyi güncelle
+    const bulbList = document.querySelectorAll('.bulb-list li');
+    bulbList.forEach((listItem) => {
+        const text = listItem.textContent.trim();
+        if (bulbMapping[text] && bulbMapping[text] !== '') {
+            listItem.textContent = `${text}: ${bulbMapping[text]}`;
+            listItem.setAttribute('data-bulb', bulbMapping[text]); // Veriyi ekle
+            listItem.style.display = 'list-item'; // Görünür yap
+        } else {
+            listItem.style.display = 'none'; // Boş olanları gizle
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const bulbList = document.querySelectorAll('.bulb-list li');
+  const modal = document.getElementById('bulbModal');
+  const modalImage = document.getElementById('modal-bulb-image');
+  const modalDescription = document.getElementById('modal-bulb-description');
+  const closeModalButton = document.querySelector('.close');
+  
+  // Modal'ı açma ve kapama işlevi
+  bulbList.forEach((bulb) => {
+    bulb.addEventListener('click', () => {
+      const bulbName = bulb.textContent.split(':')[0].trim();
+      let bulbValue = bulb.getAttribute('data-bulb');
+
+      // Ampül değerindeki boşlukları ve eğik çizgileri alt çizgiye dönüştür
+      bulbValue = bulbValue.replace(/\s+/g, '_').replace(/\//g, '_').toUpperCase();
+
+      // Resim yolu
+      const imagePath = `../resim/bulbs/${bulbValue}.jpg`;
+
+      // Modal içeriklerini güncelle
+      modalImage.src = imagePath;
+      modalImage.alt = `${bulbName} Bulb Image`;
+      modalDescription.textContent = `${bulbName} için detaylı görsel`;
+
+      // Modal'ı göster
+      modal.style.display = "block";
+    });
+  });
+
+  // Modal'ı kapama
+  closeModalButton.addEventListener('click', () => {
+    modal.style.display = "none";
+  });
+
+  // Modal dışına tıklandığında da kapama
+  window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+});
+
+
+
+document.querySelectorAll('.bulb-list li').forEach(bulb => {
+    bulb.addEventListener('click', () => {
+        const bulbValue = bulb.getAttribute('data-bulb').replace(/\s+/g, '_').replace(/\//g, '_').toUpperCase();
+        const imagePath = `../resim/bulbs/${bulbValue}.jpg`;
+
+        // URL Linki ekleyin (örnek olarak; URL'yi buldunuz ya da dışarıdan ekleyebilirsiniz)
+		const bulbUrl = `ampuller.html?product=${bulbValue.replace(/_/g, '/')}`;
+		
+        // Modal'ı aç
+        const modal = document.getElementById('bulb-modal');
+        const modalImage = document.getElementById('modal-bulb-image');
+        const modalLink = document.getElementById('modal-bulb-link');
+
+        modalImage.src = imagePath;
+        modalLink.innerHTML = `<a href="${bulbUrl}" target="_blank">Ampül Ayrıntıları İçin Tıklayın</a>`;
+        
+        modal.style.display = "block";
+    });
+});
+
+// Modal'ı kapatma
+document.querySelector('.close').addEventListener('click', () => {
+    document.getElementById('bulb-modal').style.display = "none";
+});
+
+// Modal dışına tıklanarak kapatma
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('bulb-modal');
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const bulbList = document.querySelectorAll('.bulb-list li');
+  const markers = document.querySelectorAll('.marker');
+  const frontImage = document.getElementById('front-image');
+  const rearImage = document.getElementById('rear-image');
+  const bulbImage = document.getElementById('bulb-image');
+
+  // Marker konumlarını orantılı olarak ayarlamak için bir fonksiyon
+  function updateMarkerPositions(image) {
+    const vehicleWidth = image.offsetWidth;
+    const vehicleHeight = image.offsetHeight;
+
+    const markerPositions = {
+      // Marker pozisyonlarını % olarak tanımlıyoruz
+      'front-dipped': { top: 54, left: 50 },
+      'front-main': { top: 53, left: 46 },
+      'front-indicator': { top: 51, left: 42 },
+      'front-fog': { top: 67, left: 45 },
+      'front-sidelight': { top: 53, left: 44 },
+      'front-interior': { top: 20, left: 42 },
+      'front-panel': { top: 34, left: 59 },
+      'front-side-indicator': { top: 36, left: 23 },
+      'high-brake': { top: 31, left: 72 },
+      'number-plate': { top: 46, left: 78 },
+      'rear-brake': { top: 52, left: 67 },
+      'rear-side': { top: 52, left: 68 },
+      'rear-indicator': { top: 51, left: 66 },
+      'rear-fog': { top: 65, left: 71 },
+      'reverse-light': { top: 57, left: 68 }
+    };
+    markers.forEach(marker => {
+      const position = marker.classList[1]; // Marker sınıfındaki ikinci sınıfı alıyoruz
+      const positionData = markerPositions[position];
+      if (positionData) {
+        const top = (positionData.top / 100) * vehicleHeight;  // Yüzdeyi piksel cinsine çeviriyoruz
+        const left = (positionData.left / 100) * vehicleWidth;  // Yüzdeyi piksel cinsine çeviriyoruz
+        marker.style.top = `${top}px`;
+        marker.style.left = `${left}px`;
+      }
+    });
+  }
+
+  // Sayfa boyutu değiştiğinde marker pozisyonlarını güncelle
+  window.addEventListener('resize', () => {
+    if (frontImage && !frontImage.classList.contains('hidden')) {
+      updateMarkerPositions(frontImage);
+    } else if (rearImage && !rearImage.classList.contains('hidden')) {
+      updateMarkerPositions(rearImage);
+    }
+  });
+
+  // Sayfa yüklendiğinde marker pozisyonlarını güncelle
+  if (frontImage && !frontImage.classList.contains('hidden')) {
+    updateMarkerPositions(frontImage);
+  } else if (rearImage && !rearImage.classList.contains('hidden')) {
+    updateMarkerPositions(rearImage);
+  }
+
+  bulbList.forEach((bulb) => {
+    bulb.addEventListener('mouseenter', () => {
+      const bulbName = bulb.textContent.split(':')[0].trim();
+      let bulbValue = bulb.getAttribute('data-bulb');
+
+	// Ampül değerindeki boşlukları ve eğik çizgileri alt çizgiye dönüştür
+	bulbValue = bulbValue.replace(/\s+/g, '_').replace(/\//g, '_').toUpperCase();
+
+
+      // Resim yolu
+      const imagePath = `../resim/bulbs/${bulbValue}.jpg`;
+
+      // Ampül resmi için src'yi güncelle
+      bulbImage.src = imagePath;
+      bulbImage.alt = `${bulbName} Bulb Preview`;
+      bulbImage.classList.remove('hidden');  // Resmi görünür hale getir
+
+      const position = bulb.getAttribute('data-position');
+
+      // Aracın ön ya da arka resmine göre marker ve görsel pozisyonu
+      if (position.includes('front')) {
+        frontImage.classList.remove('hidden');
+        rearImage.classList.add('hidden');
+        updateMarkerPositions(frontImage); // Front için marker pozisyonlarını güncelle
+      } else {
+        rearImage.classList.remove('hidden');
+        frontImage.classList.add('hidden');
+        updateMarkerPositions(rearImage); // Rear için marker pozisyonlarını güncelle
+      }
+      // Marker'ları aktif et
+      markers.forEach((marker) => {
+        if (marker.classList.contains(position)) {
+          marker.classList.remove('hidden'); // Uygun marker'ı göster
+        } else {
+          marker.classList.add('hidden');
+        }
+      });
+
+    });
+    bulb.addEventListener('mouseleave', () => {
+      // Marker'ları gizle
+      markers.forEach((marker) => {
+        marker.classList.add('hidden');
+      });
+
+      // Ampül Resmini Gizle
+      bulbImage.classList.add('hidden');
+    });
+  });
+});
+  
+  </script>
+</body>
+</html>
