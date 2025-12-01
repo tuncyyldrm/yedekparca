@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipariş</title>
+<style>
+	table {
+		width: 100%;
+		margin: auto;
+		border-collapse: collapse;
+	}
+    table, th, td {
+        border: 1px solid black;
+        padding: 2px;
+    }
+    th {
+        position: sticky;
+        top: 0;
+        background-color: #f2f2f2; /* Başlık satırının arka plan rengi */
+        z-index: 1; /* Başlığın veri hücrelerinin üzerinde görünmesini sağlar */
+        cursor: pointer;
+    }
+	tr {
+	    height: 190px;
+	}
+	
+    .oem {
+        background-color: lightgreen; /* OEM stok kodları için yeşil arka plan rengi */
+    }
+    .rnr {
+        background-color: lightblue; /* OEM stok kodları için yeşil arka plan rengi */
+    }
+    .pnh {
+        background-color: orange; /* OEM stok kodları için yeşil arka plan rengi */
+    }
+    .yok {
+        background-color: lightcoral;
+
+    }
+    .highlighted {
+        background-color: yellow;
+    }
+    p {
+        margin: 0;
+        font-weight: bold;
+    }
+    /* Lightbox stil */
+    #lightbox {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        flex-direction: column;
+    }
+    #lightbox img {
+        max-width: 90%;
+        max-height: 70%;
+    }
+    #lightbox p {
+        color: white;
+        margin-top: 20px;
+        font-size: 18px;
+    }
+    #lightbox:target {
+        display: flex;
+    }
+
+    /* 1. ve 4. sütunlar için ortalama */
+    td:nth-child(2), td:nth-child(5) {
+        text-align: center;
+    }
+
+    /* 2. ve 3. sütunlar için sağa hizalama */
+    td:nth-child(1), td:nth-child(3), td:nth-child(4) {
+        text-align: right;
+    }
+	
+	    /* 2. ve 3. sütunlar için sağa hizalama */
+    tr:nth-child(1) {
+        height: auto;
+    }
+</style>
+
+    <script>
+        let currentSortColumn = null;
+        let isAscending = true; // Global olarak tanımlandı
+
+        async function fetchGoogleSheetData() {
+            const apiKey = 'AIzaSyCQ_SmNuv0JxBBtaiSi7LGxPmeqOPygjYc'; // Google Sheets API anahtarınızı buraya girin
+            const spreadsheetId = '1IUTkfS0D0157tj8rM5GQsSO2nWjlrE-V16W_cYPRs48'; // Google Sheets ID'nizi buraya girin
+            const range = 'LİSTE!B2:F'; // Veri aralığını buraya girin
+
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayData(data.values);
+            } catch (error) {
+                console.error('Google Sheets verilerini çekme hatası:', error);
+            }
+        }
+
+        function displayData(values) {
+            const table = document.createElement('table');
+            const headerRow = ['No', 'Resim ve Stok Kodu', 'S.Mik.', 'Depo', 'D']; // Başlıklar
+            const trHeader = document.createElement('tr');
+            headerRow.forEach((header, index) => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                th.onclick = () => sortTable(index);
+                trHeader.appendChild(th);
+            });
+            table.appendChild(trHeader);
+
+            values.forEach((row, rowIndex) => {
+                const tr = document.createElement('tr');
+
+                // 1. Sütun: Sıra No
+                const tdNumber = document.createElement('td');
+                tdNumber.textContent = rowIndex + 1; // Sıra numarasını ekle
+                tr.appendChild(tdNumber);
+
+                // 2. Sütun: Resim ve Stok Kodu (0 ve 1. index)
+                const tdImageAndStockCode = document.createElement('td');
+                if (row[0] && row[1]) {
+                    const img = document.createElement('img');
+                    img.src = row[0]; // Resim URL'si
+                    img.style.width = '100%'; // Resim boyutunu ayarla
+                    img.style.cursor = 'pointer';
+                    img.onclick = function() {
+                        openLightbox(row[0], row[1]); // Resim ve stok kodunu geç
+                    };
+
+                    const stockCodeText = document.createElement('p');
+                    stockCodeText.textContent = row[1]; // Stok Kodu
+
+                    tdImageAndStockCode.appendChild(img);
+                    tdImageAndStockCode.appendChild(stockCodeText);
+                }
+                tr.appendChild(tdImageAndStockCode);
+
+                // Diğer sütunlar (2 ve 4. index)
+                [2, 4].forEach(index => {
+                    const td = document.createElement('td');
+                    td.textContent = row[index] || ''; // Veriyi ekle veya boş bırak
+                    tr.appendChild(td);
+                });
+
+                // 4. Sütun: Durum (Checkbox) (3. index)
+                const tdCheckbox = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+
+                // Checkbox seçildiğinde satırı boyamak için event listener ekleyelim
+                checkbox.addEventListener('change', function() {
+                    if (checkbox.checked) {
+                        tr.classList.add('highlighted');
+                    } else {
+                        tr.classList.remove('highlighted');
+                    }
+                });
+
+                tdCheckbox.appendChild(checkbox);
+                tr.appendChild(tdCheckbox);
+
+                table.appendChild(tr);
+            });
+
+            highlightRows(table); // Satırları boyama fonksiyonunu çağır
+
+            document.body.appendChild(table);
+        }
+
+function highlightRows(table) {
+    const rows = table.querySelectorAll('tr:not(:first-child)');
+    rows.forEach(row => {
+        const cells = row.children;
+        const stockAmount = parseFloat(cells[2].textContent.trim()) || 0;
+        const warehouseAmount = parseFloat(cells[3].textContent.trim()) || 0;
+        const stockCode = cells[1].textContent.trim();
+
+
+        // Stok kodunda "OEM" kontrolü
+        if (stockCode.includes("OEM")) {
+            row.classList.add('oem');
+        }
+        // Stok kodunda "OEM" kontrolü
+        if (stockCode.includes("RNR")) {
+            row.classList.add('rnr');
+        }
+        // Stok kodunda "OEM" kontrolü
+        if (stockCode.includes("PNH")) {
+            row.classList.add('pnh');
+        }
+        // Depo ve S.Mik. karşılaştırması
+        if (warehouseAmount < stockAmount) {
+            row.classList.add('yok');
+        }
+    });
+}
+
+
+        function sortTable(columnIndex) {
+            const table = document.querySelector('table');
+            const rows = Array.from(table.querySelectorAll('tr:not(:first-child)'));
+            const type = columnIndex === 0 ? 'number' : columnIndex === 1 ? 'string' : 'number'; // Sıra numarası ve Resim-Stok kodu için özel türler
+
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.children[columnIndex].textContent.trim();
+                const cellB = rowB.children[columnIndex].textContent.trim();
+
+                if (type === 'number') {
+                    return isAscending ? cellA - cellB : cellB - cellA;
+                } else {
+                    return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+                }
+            });
+
+            rows.forEach(row => table.appendChild(row));
+            isAscending = !isAscending; // Sıralama yönünü değiştir
+            currentSortColumn = columnIndex;
+        }
+
+        function openLightbox(imgSrc, stockCode) {
+            const lightboxImage = document.getElementById('lightbox-img');
+            const lightboxText = document.getElementById('lightbox-text');
+            lightboxImage.src = imgSrc;
+            lightboxText.textContent = `Ürün Stok Kodu: ${stockCode}`;
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+
+        window.onload = fetchGoogleSheetData;
+    </script>
+</head>
+<body>
+    <h1>Siparis</h1>
+
+    <!-- Lightbox div -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Büyütülmüş Resim">
+        <p id="lightbox-text"></p>
+    </div>
+</body>
+</html>
