@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="tr">
+<link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3FW3CNT4XK"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3FW3CNT4XK');
+</script>
+    <title>Yiğit Oto Silecek Arama</title>
+    <style>
+table {
+    width: 100%;
+    border-collapse: collapse;
+    display: none; /* Başlangıçta tabloyu gizle */
+}
+th, td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+th {
+    background-color: #f4f4f4;
+    position: relative;
+}
+
+td:nth-child(1) {
+    width: 10%;
+}
+td:nth-child(2) {
+    width: 10%;
+}
+td:nth-child(3) {
+    width: 10%;
+}
+td:nth-child(4) {
+    width: 10%;
+}
+td:nth-child(5) {
+    width: 10%;
+}
+td:nth-child(6) {
+    width: 50%; /* İçeriğe göre daha geniş bir alan bırak */
+}
+
+tr {
+    height: 20px;
+}
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+
+
+/* Mobil uyumlu stil ayarları */
+@media (max-width: 768px) {
+    table {
+        width: 100%;
+        display: block;
+        overflow-x: auto; /* Mobilde tabloyu yatayda kaydırılabilir yap */
+        white-space: nowrap; /* Sütunlar yan yana kaydırılabilir olacak */
+    }
+    
+    th, td {
+        display: block;
+        text-align: left;
+		border: 0px solid #ddd;
+    }
+	tr {
+    height: 20px;
+	border: 2px solid #ddd;
+}
+.grid-container {
+    display: flex;
+    gap: 20px;
+    margin: 10px 0;
+    flex-direction: column;
+}
+
+}
+
+        img {
+            max-width: 100%;
+            height: auto;
+            cursor: pointer;
+        }
+        /* Lightbox Stilleri */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        .lightbox img {
+            max-width: 100%;
+            height: 250px;
+            margin-bottom: 10px;
+        }
+        .lightbox .product-code {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 30px;
+            cursor: pointer;
+            color: white;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            padding: 5px;
+            border-radius: 50%;
+        }
+        .close:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        /* Filtreleme Dropdown Menüsü */
+		.filter-container {
+			margin-bottom: 10px;
+			display: flex;
+			justify-content: space-between;
+			flex-wrap: wrap;
+		}
+        .filter-container select {
+            padding: 6px;
+            border: 1px solid #ddd;
+        }
+        /* Grid Görünüm Stilleri */
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 10px 0;
+        }
+        .grid-item {
+            flex: 1 1 calc(33.333% - 20px);
+            border: 1px solid #ddd;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .grid-item img {
+            max-width: 100%;
+            height: auto;
+        }
+        .grid-item .product-code {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .grid-item .description {
+            margin: 10px 0;
+        }
+        .grid-item button {
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+	<div style="flex: 1;">
+<div style="display:flex""><a href="./silecek.html" class="fas fa-arrow-left" style="color:black;font-weight: bold;text-decoration: none;font-size: 24px;font-weight: bold;"></a>
+<h2 style="margin-block:0;">Yiğit Oto Silecek Arama</h2></div>
+<div class="filter-container">
+	
+    <div>
+        <label for="filterBrand">Marka:</label>
+        <select id="filterBrand" onchange="filterProducts()">
+            <option value="">Tümü</option>
+            <!-- Marka seçenekleri buraya yüklenecek -->
+        </select>
+    </div>
+	<input type="text" id="searchInput" placeholder="Ürün arayın..." onkeyup="searchProducts()">
+
+
+    <div style="display:none;">
+	 <!-- Kategori seçenekleri buraya yüklenecek -->
+        <label for="filterCategory">Kategori:</label>
+        <select id="filterCategory" onchange="filterProducts()">
+            <option value="">Tümü</option>           
+        </select>
+    </div>
+    <button id="toggleViewBtn" onclick="toggleView()">Liste Görünümü</button>
+</div>
+<table id="productTable">
+    <thead>
+        <tr>
+            <th onclick="sortTable(0)">MODEL</th>
+            <th onclick="sortTable(1)">MARKA</th>
+            <th onclick="sortTable(2)">MODEL YILI</th>
+            <th onclick="sortTable(3)">SURUCU</th>
+            <th onclick="sortTable(4)">YOLCU</th>
+            <th onclick="sortTable(5)">APARAT</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Veriler buraya yüklenecek -->
+    </tbody>
+</table>
+<div id="gridView" class="grid-container" style="display: flex;">
+    <!-- Ürünler burada grid görünümünde yüklenecek -->
+</div>
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <div>
+        <span class="close">&times;</span>
+        <img id="lightboxImage" src="" alt="">
+        <div id="lightboxProductCode" class="product-code"></div>
+    </div>
+</div>
+<!-- Sayfa Kontrolleri -->
+<div id="paginationControls">
+    <button id="prevPageBtn">Önceki</button>
+    <span id="pageInfo"></span>
+    <button id="nextPageBtn">Sonraki</button>
+</div>
+
+	</div>
+
+<footer style="background-color: #333333;color: white;text-align: center;padding: 15px 0;position: relative;width: 100%;font-size: 14px;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
+  © 2022 - <span id="currentYear"></span> <a target="_blank" style="color: #ffcc00;" href="https://tuncyyldrm.vercel.app" >Tuncay YILDIRIM</a>
+</footer>
+
+<!-- JavaScript -->
+<script>
+  function toggleContactPopup() {
+    const popup = document.getElementById("contact-popup");
+    popup.style.display = (popup.style.display === "none" ? "block" : "none");
+  }
+
+  // Dinamik olarak güncel yılı gösterme
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+  // Service Worker kaydı
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/service-worker.js', { scope: '/' })
+      .then(() => console.log('Ana dizin için Service Worker kaydedildi.'))
+      .catch(err => console.error('Service Worker kaydı başarısız:', err));
+  }
+</script>
+<script>
+    const apiKey = 'AIzaSyCQ_SmNuv0JxBBtaiSi7LGxPmeqOPygjYc';
+    const spreadsheetId = '1E5cy7u7-ht3bMzU374TGX_zu7q09_Nn2HLkzZb0n7DM';
+    const range = 'vt!A3:H';
+    const imageBaseUrl = './resim/aparat/';
+    let products = [];
+fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`)
+    .then(response => response.json())
+    .then(data => {
+        const rows = data.values;
+        let brands = new Set();
+        let categories = new Set();
+        rows.forEach(row => {
+            if (row[5] !== '0') {
+                products.push({
+                    model: row[0],
+                    marka: row[1],
+                    m_yil: row[2],
+                    s_inc: parseFloat(row[3]), // String'den float'a çeviriyoruz
+					y_inc: parseFloat(row[4]), // String'den float'a çeviriyoruz
+                    aimage1: imageBaseUrl + 'A' + row[5] + '.jpg',
+                    aimage2: imageBaseUrl + 'A' + row[6] + '.jpg',
+                    aimage3: imageBaseUrl + 'A' + row[7] + '.jpg',
+                    wimage1: imageBaseUrl + 'W' + row[5] + '.jpg',
+                    wimage2: imageBaseUrl + 'W' + row[6] + '.jpg',
+                    wimage3: imageBaseUrl + 'W' + row[7] + '.jpg'
+                });
+                brands.add(row[1]);
+                categories.add(row[1]);
+            }
+        });
+        populateFilterOptions('filterBrand', Array.from(brands));
+        populateFilterOptions('filterCategory', Array.from(categories));
+        displayPage(1); // İlk sayfayı göster
+    })
+    .catch(error => console.error('Error:', error));
+
+// Ölçü birimini saklayacak değişken
+let currentUnit = 'inch'; // Başlangıçta varsayılan olarak inç
+
+// Ölçü birimi dönüştürme fonksiyonları
+function inchesToMillimeters(inches) {
+    return inches * 25.4;
+}
+
+function millimetersToInches(mm) {
+    return mm / 25.4;
+}
+
+	function populateFilterOptions(selectId, options) {
+        const selectElement = document.getElementById(selectId);
+        options.forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option;
+            opt.textContent = option;
+            selectElement.appendChild(opt);
+        });
+    }
+
+// Türkçe karakterleri dönüştürme fonksiyonu
+function normalizeString(str) {
+    const charMap = {
+        'ç': 'c', 'Ç': 'c',
+        'ğ': 'g', 'Ğ': 'g',
+        'ı': 'i', 'I': 'i',
+        'İ': 'i', 'ş': 's', 'Ş': 's',
+        'ö': 'o', 'Ö': 'o',
+        'ü': 'u', 'Ü': 'u'
+    };
+    return str.replace(/[çğışöüÇĞIŞÖÜ]/g, function(ch) {
+        return charMap[ch] || ch;
+    }).toLowerCase();
+}
+
+const productsPerPage = 25; // Her sayfada gösterilecek ürün sayısı
+let currentPage = 1;
+
+// Sayfa güncelleme fonksiyonu
+function displayPage(page, filteredProductsParam = null) {
+    currentPage = page;
+
+    // Filtrelenmiş ürünler varsa, bu listeyi kullan
+    let productsToDisplay = filteredProductsParam ? filteredProductsParam : products;
+
+    // Filtreleme ve arama terimlerini uygulayın
+    if (currentFilterBrand) {
+        productsToDisplay = productsToDisplay.filter(product => product.marka === currentFilterBrand);
+    }
+    if (currentFilterCategory) {
+        productsToDisplay = productsToDisplay.filter(product => product.model === currentFilterCategory);
+    }
+    if (currentSearchTerms.length > 0) {
+        productsToDisplay = productsToDisplay.filter(product => {
+            return currentSearchTerms.every(term => {
+                let normalizedTerm = normalizeString(term);
+                return Object.values(product).some(value => {
+                    return normalizeString(value.toString()).includes(normalizedTerm);
+                });
+            });
+        });
+    }
+
+    let startIndex = (currentPage - 1) * productsPerPage;
+    let endIndex = startIndex + productsPerPage;
+    let paginatedProducts = productsToDisplay.slice(startIndex, endIndex);
+    displayTable(paginatedProducts);
+    displayGrid(paginatedProducts);
+    updatePaginationControls(productsToDisplay.length);
+}
+function updatePaginationControls(totalProductCount) {
+    let totalPages = Math.ceil(totalProductCount / productsPerPage);
+    document.getElementById('pageInfo').textContent = `Sayfa ${currentPage} / ${totalPages}`;
+
+    document.getElementById('prevPageBtn').disabled = (currentPage === 1);
+    document.getElementById('nextPageBtn').disabled = (currentPage === totalPages);
+}
+
+document.getElementById('prevPageBtn').addEventListener('click', function () {
+    if (currentPage > 1) {
+        displayPage(currentPage - 1);
+    }
+});
+
+document.getElementById('nextPageBtn').addEventListener('click', function () {
+    let totalPages = Math.ceil(products.length / productsPerPage);
+    if (currentPage < totalPages) {
+        displayPage(currentPage + 1);
+    }
+});
+
+// Global değişkenler
+let currentFilterBrand = '';
+let currentFilterCategory = '';
+let currentSearchTerms = [];
+
+function normalizeMeasurement(valueStr) {
+    let number = parseFloat(valueStr);
+    return isNaN(number) ? 0 : number;
+}
+
+// Arama işlemi
+function searchProducts() {
+    let searchInput = document.getElementById('searchInput').value.toLowerCase();
+    let searchTerms = searchInput.split(' ').filter(term => term);
+
+    currentSearchTerms = searchTerms;
+
+    filteredProducts = products.filter(product => {
+        return searchTerms.every(term => {
+            let normalizedTerm = normalizeString(term);
+
+            return Object.values(product).some(value => {
+                let valueStr = value.toString().toLowerCase();
+                let normalizedValue = normalizeString(valueStr);
+
+                let valueAsNumber = normalizeMeasurement(valueStr);
+                let valueInMm = currentUnit === 'inch' ? inchesToMillimeters(valueAsNumber) : valueAsNumber;
+                let valueInInches = currentUnit === 'mm' ? millimetersToInches(valueAsNumber) : valueAsNumber;
+				
+                return normalizedValue.includes(normalizedTerm) ||
+                    valueAsNumber.toString().includes(normalizedTerm) ||
+                    valueInMm.toString().includes(normalizedTerm) ||
+                    valueInInches.toString().includes(normalizedTerm);
+            });
+        });
+    });
+
+    displayPage(1, filteredProducts); // İlk sayfayı göster
+}
+
+
+// Filtreleme işlemi
+function filterProducts() {
+    let filterBrand = document.getElementById('filterBrand').value;
+    let filterCategory = document.getElementById('filterCategory').value;
+
+    // Global değişkenleri güncelle
+    currentFilterBrand = filterBrand;
+    currentFilterCategory = filterCategory;
+
+    filteredProducts = products.filter(product => {
+        return (!filterBrand || product.marka === filterBrand) &&
+               (!filterCategory || product.model === filterCategory);
+    });
+
+    displayPage(1, filteredProducts); // İlk sayfayı göster
+}
+
+window.onload = function () {
+    let table = document.getElementById('productTable');
+    let gridView = document.getElementById('gridView');
+    let button = document.getElementById('toggleViewBtn');
+    // Varsayılan olarak tabloyu göster ve butonu 'Grid Görünümü' olarak ayarla
+    table.style.display = 'table';
+    gridView.style.display = 'none';
+    button.textContent = 'Grid Görünümü';
+    displayPage(1); // İlk sayfayı göster
+};
+
+// Tabloyu güncelleyici fonksiyon
+function displayTable(products) {
+    let tableBody = document.querySelector("#productTable tbody");
+    tableBody.innerHTML = '';
+    products.forEach(product => {
+        let newRow = tableBody.insertRow();
+
+        // Model
+        let modelCell = newRow.insertCell();
+        modelCell.textContent = product.model;
+
+        // Marka
+        let markaCell = newRow.insertCell();
+        markaCell.textContent = product.marka;
+
+        // Model Yılı
+        let mYilCell = newRow.insertCell();
+        mYilCell.textContent = product.m_yil;
+
+// Ölçü
+let sIncCell = newRow.insertCell();
+let sIncDiv = document.createElement('div');
+sIncDiv.innerHTML = `
+    <div style="display: flex; flex-direction: column;">
+        <span style="font-weight: bold; color: #333;">${currentUnit === 'mm' 
+            ? inchesToMillimeters(product.s_inc).toFixed(2) + ' mm'
+            : product.s_inc.toFixed(2) + ' inch'}</span>
+        <span style="color: #666;">${currentUnit === 'mm' 
+            ? product.s_inc.toFixed(2) + ' inch'
+            : inchesToMillimeters(product.s_inc).toFixed(2) + ' mm'}</span>
+    </div>
+`;
+sIncCell.appendChild(sIncDiv);
+
+// Ölçü
+let yIncCell = newRow.insertCell();
+let yIncDiv = document.createElement('div');
+yIncDiv.innerHTML = `
+    <div style="display: flex; flex-direction: column;">
+        <span style="font-weight: bold; color: #333;">${currentUnit === 'mm' 
+            ? inchesToMillimeters(product.y_inc).toFixed(2) + ' mm'
+            : product.y_inc.toFixed(2) + ' inch'}</span>
+        <span style="color: #666;">${currentUnit === 'mm' 
+            ? product.y_inc.toFixed(2) + ' inch'
+            : inchesToMillimeters(product.y_inc).toFixed(2) + ' mm'}</span>
+    </div>
+`;
+yIncCell.appendChild(yIncDiv);
+
+
+// Resimler
+let imageCell = newRow.insertCell();
+imageCell.className = 'image-cell'; // Görsel hücreye özel sınıf ekleyebiliriz
+
+// Resim 1'leri saran div
+let imageGroup1Wrapper = document.createElement('div');
+imageGroup1Wrapper.className = 'image-wrapper'; // Resim 1'leri saracak div
+
+// Resim 1
+if (product.aimage1 && !product.aimage1.includes('undefined')) {
+    let imgElement1 = document.createElement('img');
+    imgElement1.src = product.aimage1;
+    imgElement1.alt = `${product.model} - Resim 1`;
+    imgElement1.className = 'product-image'; // CSS ile düzenlemek için sınıf
+    imgElement1.onclick = function () {
+        openLightbox(imgElement1.src, product.model);
+    };
+    imageGroup1Wrapper.appendChild(imgElement1);
+}
+
+// Resim 1 (yeni görüntü)
+if (product.wimage1 && !product.wimage1.includes('undefined')) {
+    let imgElement1 = document.createElement('img');
+    imgElement1.src = product.wimage1;
+    imgElement1.alt = `${product.model} - Resim 1`;
+    imgElement1.className = 'product-image'; // CSS ile düzenlemek için sınıf
+    imgElement1.onclick = function () {
+        openLightbox(imgElement1.src, product.model);
+    };
+    imageGroup1Wrapper.appendChild(imgElement1);
+}
+
+// Resim 2'leri saran div
+let imageGroup2Wrapper = document.createElement('div');
+imageGroup2Wrapper.className = 'image-wrapper'; // Resim 2'leri saracak div
+
+// Resim 2
+if (product.aimage2 && !product.aimage2.includes('undefined')) {
+    let imgElement2 = document.createElement('img');
+    imgElement2.src = product.aimage2;
+    imgElement2.alt = `${product.model} - Resim 2`;
+    imgElement2.className = 'product-image';
+    imgElement2.onclick = function () {
+        openLightbox(imgElement2.src, product.model);
+    };
+    imageGroup2Wrapper.appendChild(imgElement2);
+}
+
+// Resim 2 (yeni görüntü)
+if (product.wimage2 && !product.wimage2.includes('undefined')) {
+    let imgElement2 = document.createElement('img');
+    imgElement2.src = product.wimage2;
+    imgElement2.alt = `${product.model} - Resim 2`;
+    imgElement2.className = 'product-image';
+    imgElement2.onclick = function () {
+        openLightbox(imgElement2.src, product.model);
+    };
+    imageGroup2Wrapper.appendChild(imgElement2);
+}
+
+// Resim 3'leri saran div
+let imageGroup3Wrapper = document.createElement('div');
+imageGroup3Wrapper.className = 'image-wrapper'; // Resim 3'leri saracak div
+
+// Resim 3
+if (product.aimage3 && !product.aimage3.includes('undefined')) {
+    let imgElement3 = document.createElement('img');
+    imgElement3.src = product.aimage3;
+    imgElement3.alt = `${product.model} - Resim 3`;
+    imgElement3.className = 'product-image';
+    imgElement3.onclick = function () {
+        openLightbox(imgElement3.src, product.model);
+    };
+    imageGroup3Wrapper.appendChild(imgElement3);
+}
+
+// Resim 3 (yeni görüntü)
+if (product.wimage3 && !product.wimage3.includes('undefined')) {
+    let imgElement3 = document.createElement('img');
+    imgElement3.src = product.wimage3;
+    imgElement3.alt = `${product.model} - Resim 3`;
+    imgElement3.className = 'product-image';
+    imgElement3.onclick = function () {
+        openLightbox(imgElement3.src, product.model);
+    };
+    imageGroup3Wrapper.appendChild(imgElement3);
+}
+
+// Grupları hücreye ekle
+imageCell.appendChild(imageGroup1Wrapper);
+imageCell.appendChild(imageGroup2Wrapper);
+imageCell.appendChild(imageGroup3Wrapper);
+
+ 
+    });
+}
+
+function displayGrid(products) {
+    let gridContainer = document.querySelector("#gridView");
+    gridContainer.innerHTML = '';
+
+    products.forEach(product => {
+        let gridItem = document.createElement('div');
+        gridItem.className = 'grid-item';
+        gridItem.dataset.brand = product.marka;
+        gridItem.dataset.category = product.model; // Eğer kategori varsa buraya uygun şekilde değiştirilebilir
+
+        // Model, Marka ve Model Yılı
+        let infoHtml = `
+            <div class="product-info">
+                <h3>${product.model}</h3>
+                <p><strong>Marka:</strong> ${product.marka}</p>
+                <p><strong>Model Yılı:</strong> ${product.m_yil}</p>
+            </div>
+        `;
+
+        // Ölçüler
+        let sIncText = currentUnit === 'mm' 
+            ? `${inchesToMillimeters(product.s_inc).toFixed(2)} mm (${product.s_inc.toFixed(2)} inch)` 
+            : `${product.s_inc.toFixed(2)} inch ${inchesToMillimeters(product.s_inc).toFixed(2)} mm`;
+
+        let yIncText = currentUnit === 'mm' 
+            ? `${inchesToMillimeters(product.y_inc).toFixed(2)} mm (${product.y_inc.toFixed(2)} inch)` 
+            : `${product.y_inc.toFixed(2)} inch ${inchesToMillimeters(product.y_inc).toFixed(2)} mm`;
+
+        let dimensionsHtml = `
+            <div class="product-dimensions">
+                <p><strong>Ölçü (S):</strong> ${sIncText}</p>
+                <p><strong>Ölçü (Y):</strong> ${yIncText}</p>
+            </div>
+        `;
+
+        // Resimler
+        let imagesHtml = '';
+        if (product.aimage1 && !product.aimage1.includes('undefined')) {
+            imagesHtml += `
+                <img src="${product.aimage1}" alt="${product.model} - Resim 1" onclick="openLightbox('${product.aimage1}', '${product.model}')" style="width: 100px;">
+            `;
+        }
+        if (product.wimage1 && !product.wimage1.includes('undefined')) {
+            imagesHtml += `
+                <img src="${product.wimage1}" alt="${product.model} - Resim 1" onclick="openLightbox('${product.wimage1}', '${product.model}')" style="width: 100px;">
+            `;
+        }
+        if (product.aimage2 && !product.aimage2.includes('undefined')) {
+            imagesHtml += `
+                <img src="${product.aimage2}" alt="${product.model} - Resim 2" onclick="openLightbox('${product.aimage2}', '${product.model}')" style="width: 100px;">
+            `;
+        }
+        if (product.wimage2 && !product.wimage2.includes('undefined')) {
+            imagesHtml += `
+                <img src="${product.wimage2}" alt="${product.model} - Resim 2" onclick="openLightbox('${product.wimage2}', '${product.model}')" style="width: 100px;">
+            `;
+        }
+        if (product.aimage3 && !product.aimage3.includes('undefined')) {
+            imagesHtml += `
+                <img src="${product.aimage3}" alt="${product.model} - Resim 3" onclick="openLightbox('${product.aimage3}', '${product.model}')" style="width: 100px;">
+            `;
+        }
+        if (product.wimage3 && !product.wimage3.includes('undefined')) {
+            imagesHtml += `
+                <img src="${product.wimage3}" alt="${product.model} - Resim 3" onclick="openLightbox('${product.wimage3}', '${product.model}')" style="width: 100px;">
+            `;
+        }
+
+        // Grid item içeriği
+        gridItem.innerHTML = `
+            ${infoHtml}
+            ${dimensionsHtml}
+            <div class="product-images">
+                ${imagesHtml}
+            </div>
+        `;
+
+        gridContainer.appendChild(gridItem);
+    });
+}
+
+
+    function openLightbox(imageUrl, productCode) {
+        document.getElementById('lightboxImage').src = imageUrl;
+        document.getElementById('lightboxProductCode').textContent = 'Stok Kodu: ' + productCode;
+        document.getElementById('lightbox').style.display = 'flex';
+    }
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+    }
+
+function toggleView() {
+    let table = document.getElementById('productTable');
+    let gridView = document.getElementById('gridView');
+    let button = document.getElementById('toggleViewBtn');
+    if (table.style.display === 'none') {
+        table.style.display = 'table';
+        gridView.style.display = 'none';
+        button.textContent = 'Grid Görünümü';
+    } else {
+        table.style.display = 'none';
+        gridView.style.display = 'flex';
+        button.textContent = 'Liste Görünümü';
+    }
+}
+
+function sortTable(n) {
+    let table = document.getElementById("productTable");
+    let rows, switching, i, x, y, shouldSwitch, dir;
+    switching = true;
+    dir = "asc";
+    
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+        for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[n];
+            y = rows[i + 1].getElementsByTagName("TD")[n];
+            if (dir === "asc") {
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            } else if (dir === "desc") {
+                if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+        }
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+        } else {
+            if (dir === "asc") {
+                dir = "desc";
+                switching = true;
+            }
+        }
+    }
+}
+</script>
+</body>
+</html>

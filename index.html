@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="tr" >
+<link rel="icon" type="image/x-icon" href="resim/yigit-oto/favicon.ico">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3FW3CNT4XK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-3FW3CNT4XK');
+  </script>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Online Yedek Parça. Özel iskonto ve fiyatlarla orijinal yedek parçalar..">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="/icons/katalogicon-192x192.png">
+
+  <title>Yiğit Otomotiv - Katalog</title>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js', {
+        scope: '/'  // Kök dizin scope’u
+    })
+    .then(() => console.log('Ana dizin Service Worker kaydedildi'))
+    .catch(err => console.error('Service Worker kayıt hatası:', err));
+}
+</script>
+<style>
+  /* Temel renk ve font değişkenleri */
+  :root {
+    --color-primary: #004285;
+    --color-primary-light: #0059b3;
+    --color-primary-dark: #002752;
+    --color-accent: #ffd43b;
+    --color-accent-hover: #ffc107;
+    --color-text-primary: #222;
+    --color-text-light: #799bbd;
+    --color-bg-start: #e0f0ff;
+    --color-bg-end: #f4f9ff;
+    --color-popup-bg: rgba(0, 0, 0, 0.6);
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+    --transition-slow: 0.4s ease;
+    --border-radius-lg: 15px;
+    --border-radius-full: 50px;
+    --shadow-light: 0 2px 8px rgba(0, 66, 133, 0.2);
+    --shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --shadow-heavy: 0 10px 30px rgba(0, 0, 0, 0.2);
+    --shadow-accent: 0 10px 30px rgba(255, 212, 59, 0.7);
+  }
+
+  /* Box sizing */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  /* Google Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+  body {
+    font-family: 'Inter', Arial, sans-serif;
+    background: linear-gradient(135deg, var(--color-bg-start), var(--color-bg-end));
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    background: linear-gradient(90deg, var(--color-primary-light), var(--color-primary));
+    box-shadow: 0 4px 12px rgba(0, 66, 133, 0.3);
+    padding: 10px 10px;
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+    text-align: center;
+    user-select: none;
+  }
+
+  .header h1 {
+    font-weight: 600;
+    font-size: 2.2rem;
+    letter-spacing: 0.05em;
+    margin: 0.3em;
+    color: #fff;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .header p {
+    color: #d0d9e6;
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .p-info {
+    margin-top: 10px;
+  }
+
+  .p-info .badge a {
+    background-color: var(--color-accent);
+    color: var(--color-primary);
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: var(--border-radius-full);
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition:
+      background-color var(--transition-medium),
+      color var(--transition-medium),
+      transform var(--transition-fast);
+    display: inline-block;
+    margin: 0 8px 10px 8px;
+  }
+
+  .p-info .badge a:hover,
+  .p-info .badge a:focus-visible {
+    background-color: var(--color-accent-hover);
+    color: var(--color-primary-dark);
+    transform: scale(1.05);
+    outline-offset: 2px;
+    outline: 2px solid var(--color-accent-hover);
+  }
+
+  /* Arama kutusu */
+  
+	 #container{
+	  margin :auto 15vw;
+	  }
+  
+  #myInput {
+    width: 95%;
+    max-width: 600px;
+    padding: 10px 15px;
+    margin: 20px auto 40px auto;
+    display: block;
+    border-radius: var(--border-radius-full);
+    border: 2px solid var(--color-primary);
+    box-shadow: var(--shadow-light);
+    font-size: 1.1rem;
+    transition:
+      border-color var(--transition-medium),
+      box-shadow var(--transition-medium);
+    font-weight: 500;
+  }
+
+  #myInput::placeholder {
+    color: var(--color-text-light);
+    font-style: italic;
+  }
+
+  #myInput:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 12px var(--color-accent);
+  }
+
+  /* Kartlar (items) */
+  #myUL {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+    padding: 0 10px;
+  }
+
+  .items {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--shadow-medium);
+    transition:
+      transform var(--transition-medium),
+      box-shadow var(--transition-medium);
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px 10px;
+    user-select: text; /* Seçilebilir metin */
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  
+  .desktop-only {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--shadow-medium);
+    transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    user-select: text;
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+  }
+
+  .items:hover,
+  .items:focus-visible {
+    outline: 3px solid var(--color-accent);
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: var(--shadow-accent);
+  }
+
+  .items .icon {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    user-select: none;
+  }
+
+  .items p {
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--color-primary);
+    margin: 0;
+    text-align: center;
+  }
+
+  /* Popup bildirim */
+  #update-notification {
+    display: none; /* Başlangıçta gizli */
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: var(--color-popup-bg);
+    z-index: 1500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-slow);
+  }
+
+  #update-notification.show {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .notification-content {
+    background-color: #007bff;
+    color: white;
+    padding: 25px 30px;
+    border-radius: var(--border-radius-lg);
+    text-align: center;
+    max-width: 380px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    font-size: 1.1rem;
+    position: relative;
+    user-select: none;
+  }
+
+  #close-notification {
+    background-color: var(--color-primary-dark);
+    border: none;
+    color: white;
+    border-radius: var(--border-radius-full);
+    padding: 10px 25px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition:
+      background-color var(--transition-medium),
+      transform var(--transition-fast);
+  }
+
+  #close-notification:hover,
+  #close-notification:focus-visible {
+    background-color: #00254d;
+    transform: scale(1.05);
+    outline-offset: 2px;
+    outline: 2px solid var(--color-accent);
+  }
+
+  /* Footer */
+  footer {
+    background-color: var(--color-primary-dark);
+    color: var(--color-accent);
+    font-weight: 600;
+    padding: 20px 0;
+    font-size: 1rem;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    user-select: none;
+  }
+
+  footer a {
+    color: #ffe066;
+    text-decoration: underline;
+    transition: color var(--transition-medium);
+  }
+
+  footer a:hover,
+  footer a:focus-visible {
+    color: #fff3b0;
+    outline-offset: 2px;
+    outline: 2px solid var(--color-accent);
+  }
+
+  /* Banner */
+  .banner {
+    width: 70%;
+    height: auto;
+  }
+
+  .search-container {
+    position: relative;
+    width: 80%;
+    max-width: 600px;
+    margin: 20px auto 10px auto;
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.3rem;
+    color: var(--color-text-light);
+    pointer-events: none;
+  }
+  .main{
+  margin: auto 5vw;
+  }
+  
+    #slayt-mesajlar a {
+    font-size: 1rem;
+    color: #222;
+    text-decoration: none;
+    transition: opacity 0.4s ease;
+    font-weight: bold;
+  }
+
+  #slayt-mesajlar a:hover {
+    color: #007bff;
+  }
+
+  /* Responsive - Tablet & Mobil */
+  @media (max-width: 1024px) {
+	 #container{
+	  margin :0; 
+	 }
+  }
+
+  @media (max-width: 768px) {
+	.desktop-only {
+      display: none;
+    }
+
+    #myUL {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 20px;
+      padding: 0 5px;
+    }
+
+    .items .icon {
+      width: 100%;
+      height: 90px;
+    }
+
+    #myInput {
+      width: 95%;
+      font-size: 1rem;
+      padding: 10px 15px;
+    }
+  }
+</style>
+
+</head>
+
+<body style="min-height: 100vh; display: flex; flex-direction: column; margin: 0;">
+  <div style="flex: 1;">
+    <!-- Popup Bildirim -->
+    <div id="update-notification" style="display: none;">
+      <div class="notification-content">
+        <p>Yiğit Otomotiv</p>
+        <p>
+          <strong>Her marka ve model için geniş yelpazede yedek parça seçenekleri</strong> 
+        </p>		
+        <p>İhtiyacınız olan ürünü kolayca bulun, aracınıza en uygun parçayı seçin!</p>
+        <button id="close-notification">Kapat</button>
+      </div>
+    </div>
+
+    <div id="container">
+      <div class="header">
+        <div class="logo">
+          <!-- <img src="http://yigit-otomotiv.bplaced.net/resim/yigit-oto/ygt_oto_banner.png"> -->
+          <h1>Yiğit Otomotiv</h1>
+          <p>Online Yedek Parça. Özel iskonto ve fiyatlarla orijinal yedek parçalar..</p>
+        </div>
+        <div class="p-info">
+          <span class="badge"><a href="https://b2b.yigitotomotiv.com/web/" target="_blank">B2B</a></span>
+          <span class="badge"><a href="./siparis/" target="_blank">KONTAK SİPARİŞ</a></span>
+          <!-- <span class="badge"><a href="./destek" target="_blank" >DESTEK</a></span> -->
+        </div>
+      </div>
+
+      <div class="main">
+<!-- SLAYT ALANI -->
+<div style="text-align:center; margin: 20px auto; position: relative;">
+  <img class="banner" src="resim/slayt/1.png" alt="Banner" style="max-width:100%; height:auto;">
+  
+  <div id="slayt-mesajlar">
+    <a href="siparis/?durum=yeni" class="slayt-item" style="display: inline;color:green;">Yeni kontak ürünleri burada!</a>
+    <a href="soketler?q=far" class="slayt-item" style="display: none;color:red;">Far soketleri burada!</a>
+    <a href="anahtarlar?q=volvo" class="slayt-item" style="display: none;color:orange;">Volvo cam anahtarları burada!</a>
+  </div>
+</div>
+
+
+<div class="search-container">
+  <input id="myInput" type="text" placeholder="Kategori ara..." aria-label="Ürün arama kutusu">
+  <span class="search-icon" aria-hidden="true">🔍</span>
+</div>
+<p id="no-results" style="display:none; text-align:center; color:#999;">Sonuç bulunamadı.</p>
+
+
+        <div id="myUL" class="sort-list" role="list">
+          <!-- Kategoriler -->
+<a href="soketler.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="" data-date="11-02-2020">
+    <span class="yeni" style="display: none;">51- 100- 101- 102- 103- 104- 105- 106- 107- 108- 109- 110- 111- 112- 113- 114- 115- 116- 120- 122- 124- 125- 134- 135- 140- 142- 146- 190- 53- TESİSAT TEYİP DUY</span>
+    <img src="img/soket.jpg" class="icon" alt="Soketler">
+    <p>SOKETLER</p>
+  </div>
+</a>
+
+<a href="kontaklar.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="" data-date="12-04-2020">
+    <span class="yeni" style="display: none;">57- 45- TERMİK KİLİT</span>
+    <img src="img/kontak.jpg" class="icon" alt="Kontaklar">
+    <p>KONTAKLAR</p>
+  </div>
+</a>
+
+<a href="rezistanslar.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="" data-date="13-02-2020">
+    <span class="yeni" style="display: none;">50- FAN KALORİFER</span>
+    <img src="img/rezistans.jpg" class="icon" alt="Rezistanslar">
+    <p>REZİSTANSLAR</p>
+  </div>
+</a>
+
+<a href="km_sensorleri.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="" data-date="14-02-2020">
+    <span class="yeni" style="display: none;">05- KİLOMETRE</span>
+    <img src="img/kmsensoru.jpg" class="icon" alt="KM Sensörü">
+    <p>KM SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="park_sensorleri.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="" data-date="15-02-2020">
+    <span class="yeni" style="display: none;">04-</span>
+    <img src="img/parksensoru.jpg" class="icon" alt="Park Sensörü">
+    <p>PARK SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="eksantrikdevirsensoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="" data-date="18-02-2020">
+    <span class="yeni" style="display: none;">07-</span>
+    <img src="img/eksantrikdevirsensoru.jpg" class="icon" alt="Eksantrik Devir Sensörü">
+    <p>EKSANTRİK DEVİR SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="krankdevirsensoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="" data-date="22-02-2020">
+    <span class="yeni" style="display: none;">10-</span>
+    <img src="img/krankdevirsensoru.jpg" class="icon" alt="Krank Devir Sensörü">
+    <p>KRANK DEVİR SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="beyinler.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="" data-date="24-02-2020">
+    <span class="yeni" style="display: none;">01- XENON FAR LED</span>
+    <img src="img/beyin.jpg" class="icon" alt="Beyinler">
+    <p>BEYİNLER</p>
+  </div>
+</a>
+
+<a href="far_sinyal_kollari.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">49- SİLECEK KOLU FAR SİNYAL</span>
+    <img src="img/farsinyalkolu.jpg" class="icon" alt="Far ve Sinyal Kolları">
+    <p>FAR SİNYAL VE SİLECEK KOLLARI</p>
+  </div>
+</a>
+
+<a href="anahtarlar.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">46- CAM SUNROOF FLAŞÖR EL FRENİ START-STOP FAR AYNA AYAR ANAHTARI</span>
+    <img src="img/anahtar.jpg" class="icon" alt="Cam Anahtarları">
+    <p>CAM ANAHTARLARI</p>
+  </div>
+</a>
+
+<a href="bobinler.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">33-</span>
+    <img src="img/bobinler.jpg" class="icon" alt="Bobinler">
+    <p>BOBİNLER</p>
+  </div>
+</a>
+
+<a href="deposamandiralari.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">41- YAKIT BENZİN DİZEL</span>
+    <img src="img/deposamandiralari.jpg" class="icon" alt="Depo Şamandıraları">
+    <p>DEPO ŞAMANDIRA</p>
+  </div>
+</a>
+
+<a href="yakitpompalari.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">40- YAKIT BENZİN DİZEL</span>
+    <img src="img/yakitpompalari.jpg" class="icon" alt="Yakıt Pompaları">
+    <p>YAKIT POMPALARI</p>
+  </div>
+</a>
+
+<a href="hararetmusuru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">23-</span>
+    <img src="img/hararetmusuru.jpg" class="icon" alt="Hararet Müşürü">
+    <p>HARARET MÜŞÜRÜ</p>
+  </div>
+</a>
+
+<a href="fanmusuru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">24-</span>
+    <img src="img/fanmusuru.jpg" class="icon" alt="Fan Müşürü">
+    <p>FAN MÜŞÜRÜ</p>
+  </div>
+</a>
+
+<a href="abssensoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">06-</span>
+    <img src="img/abssensoru.jpg" class="icon" alt="ABS Sensörü">
+    <p>ABS SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="yagmusuru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">25-</span>
+    <img src="img/yagmusuru.jpg" class="icon" alt="Yağ Müşürü">
+    <p>YAĞ MÜŞÜRÜ</p>
+  </div>
+</a>
+
+<a href="gerivitesmusuru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">28-</span>
+    <img src="img/gerivitesmusuru.jpg" class="icon" alt="Geri Vites Müşürü">
+    <p>GERİ VİTES MÜŞÜRÜ</p>
+  </div>
+</a>
+
+<a href="debriyajmusuru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">27-</span>
+    <img src="img/debriyajmusuru.jpg" class="icon" alt="Debriyaj Müşürü">
+    <p>DEBRİYAJ MÜŞÜRÜ</p>
+  </div>
+</a>
+
+<a href="frenmusuru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">26-</span>
+    <img src="img/frenmusuru.jpg" class="icon" alt="Fren Müşürü">
+    <p>FREN MÜŞÜRÜ</p>
+  </div>
+</a>
+
+<a href="havasicakliksensoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">02- DIŞ</span>
+    <img src="img/havasicakliksensoru.jpg" class="icon" alt="Hava Sıcaklık Sensörü">
+    <p>HAVA SICAKLIK SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="farayarmotoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">08-</span>
+    <img src="img/farayarmotoru.jpg" class="icon" alt="Far Ayar Motoru">
+    <p>FAR AYAR MOTORU</p>
+  </div>
+</a>
+
+<a href="faryikamamotoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">03-</span>
+    <img src="img/faryikamamotoru.jpg" class="icon" alt="Far Yıkama Robotu">
+    <p>FAR YIKAMA ROBOTU</p>
+  </div>
+</a>
+
+<a href="klimabasincmusuru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">21-</span>
+    <img src="img/klimabasincmusuru.jpg" class="icon" alt="Klima Basınç Müşürü">
+    <p>KLİMA BASINC MÜŞÜRÜ</p>
+  </div>
+</a>
+
+<a href="otomotiksanziman.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">11-</span>
+    <img src="img/otomotiksanziman.jpg" class="icon" alt="Otomatik Şanzıman">
+    <p>OTOMATİK ŞANZIMAN</p>
+  </div>
+</a>
+
+<a href="role.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">55-</span>
+    <img src="img/role.jpg" class="icon" alt="Röle">
+    <p>RÖLE</p>
+  </div>
+</a>
+
+<a href="kizdirmarolesi.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">59-</span>
+    <img src="img/kizdirmarolesi.jpg" class="icon" alt="Kızdırma Rölesi">
+    <p>KIZDIRMA RÖLESİ</p>
+  </div>
+</a>
+
+<a href="egzozsicakliksensoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">13-</span>
+    <img src="img/egzozsicakliksensoru.jpg" class="icon" alt="Egzoz Sıcaklık Sensörü">
+    <p>EGZOZ SICAKLIK SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="kelebekpotansiyometre.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">15-</span>
+    <img src="img/kelebekpotansiyometre.jpg" class="icon" alt="Kelebek Potansiyometre">
+    <p>KELEBEK POTANSİYOMETRE</p>
+  </div>
+</a>
+
+<a href="rolantiayarmotoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">16-</span>
+    <img src="img/rolantiayarmotoru.jpg" class="icon" alt="Rölanti Ayar Motoru">
+    <p>RÖLANTİ AYAR MOTORU</p>
+  </div>
+</a>
+
+<a href="enjektor.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">42-</span>
+    <img src="img/enjektor.jpg" class="icon" alt="Enjektör">
+    <p>ENJEKTÖR</p>
+  </div>
+</a>
+
+<a href="mapsensoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">17-</span>
+    <img src="img/mapsensoru.jpg" class="icon" alt="MAP Sensörü">
+    <p>MAP SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="camsufiskiyemotoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">43-</span>
+    <img src="img/camsufiskiyemotoru.jpg" class="icon" alt="Cam Su Fiskiye Motoru">
+    <p>CAM SU FİSKİYE MOTORU</p>
+  </div>
+</a>
+
+<a href="vuruntusensoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">14-</span>
+    <img src="img/vuruntusensoru.jpg" class="icon" alt="Vuruntu Sensörü">
+    <p>VURUNTU SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="oksijensensoru.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">12-</span>
+    <img src="img/oksijensensoru.jpg" class="icon" alt="Oksijen Sensörü">
+    <p>OKSİJEN SENSÖRÜ</p>
+  </div>
+</a>
+
+<a href="gazkelebegi.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">19-</span>
+    <img src="img/gazkelebegi.jpg" class="icon" alt="Boğaz Gaz Kelebeği">
+    <p>BOĞAZ GAZ KELEBEĞİ</p>
+  </div>
+</a>
+
+<a href="havadebimetre.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">18-</span>
+    <img src="img/havadebimetre.jpg" class="icon" alt="Hava Debimetre">
+    <p>HAVA DEBİMETRE</p>
+  </div>
+</a>
+
+<a href="silecek.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">95- 126 44- 96- 86- 93- 94- 96- 97- 98- 99-</span>
+    <img src="img/silecek.jpg" class="icon" alt="Silecekler">
+    <p>SİLECEKLER</p>
+  </div>
+</a>
+
+<a href="airbag.html" role="listitem" class="items" tabindex="0">
+  <div class="content" data-default="" data-title="">
+    <span class="yeni" style="display: none;">58-</span>
+    <img src="img/airbag.jpg" class="icon" alt="Airbag">
+    <p>AIRBAG</p>
+  </div>
+</a>
+
+<img class="desktop-only" src="https://barcode.tec-it.com/barcode.ashx?data=katalog.yigitotomotiv.com&amp;code=QRCode&amp;translate-esc=on&amp;eclevel=L" alt="QR Kod">
+
+          <!-- ... diğer kategori linkleri ... -->
+        </div>
+      </div>
+		<footer>
+			© 2022 - <span id="currentYear"></span> <a target="_blank" href="https://tuncyyldrm.vercel.app">Tuncay YILDIRIM</a>
+		</footer>
+    </div>
+  </div>
+
+
+<script>
+  // Dinamik olarak güncel yılı gösterme
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+  // Türkçe karakterleri normalize eder (örn: ç → c, ğ → g)
+  function normalizeText(text) {
+    return text
+      .toLowerCase()
+      .replace(/ç/g, 'c')
+      .replace(/ğ/g, 'g')
+      .replace(/ş/g, 's')
+      .replace(/ü/g, 'u')
+      .replace(/ı/g, 'i')
+      .replace(/ö/g, 'o')
+      .replace(/[^a-z0-9\s-]/g, ''); // özel karakterleri temizle ama "-" bırak
+  }
+
+  function search() {
+    const input = document.getElementById('myInput');
+    const filter = normalizeText(input.value);
+    const container = document.getElementById("myUL");
+    const items = container.getElementsByClassName('items');
+    const noResults = document.getElementById("noResults"); // varsa
+
+    let visibleCount = 0;
+
+    for (let i = 0; i < items.length; i++) {
+      // Tüm metin içeriğini tek metne çevir
+      const fullText = normalizeText(items[i].textContent || items[i].innerText || "");
+
+      // Tüm kelimeler tek tek aranır (örnek: "46 flasor anahtari")
+      const keywords = filter.split(/\s+/).filter(Boolean);
+      const isMatch = keywords.every(keyword => fullText.includes(keyword));
+
+      if (isMatch) {
+        items[i].style.display = '';
+        visibleCount++;
+      } else {
+        items[i].style.display = 'none';
+      }
+    }
+
+    if (noResults) {
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  }
+
+  // Sayfa yüklendiğinde çalışan fonksiyonlar
+  window.onload = function() {
+    const currentVersion = "0.4";
+    const previousVersion = localStorage.getItem('siteVersion');
+    const popup = document.getElementById('update-notification');
+    const closeBtn = document.getElementById('close-notification');
+
+    // Popup gösterimi (versiyon değiştiyse)
+    if (previousVersion !== currentVersion) {
+      popup.style.display = 'flex';
+      setTimeout(() => popup.classList.add('show'), 10);
+      localStorage.setItem('siteVersion', currentVersion);
+    }
+
+    // Popup kapatma butonuna tıklayınca popup kapansın
+    closeBtn.onclick = function() {
+      popup.classList.remove('show');
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 400); // opacity transition süresi
+    };
+
+    // ESC tuşu ile popup kapatma (erişilebilirlik)
+    document.addEventListener('keydown', function(event) {
+      if (event.key === "Escape" && popup.classList.contains('show')) {
+        closeBtn.click();
+      }
+    });
+
+    // Arama kutusuna input event'i bağlama
+    document.getElementById('myInput').addEventListener('input', search);
+  };
+  
+
+  let currentSlide = 0;
+  const slideItems = document.querySelectorAll("#slayt-mesajlar .slayt-item");
+
+  function showNextSlide() {
+    slideItems[currentSlide].style.display = "none"; // aktif olanı gizle
+    currentSlide = (currentSlide + 1) % slideItems.length; // sıradakine geç
+    slideItems[currentSlide].style.display = "inline"; // yeni olanı göster
+  }
+
+  setInterval(showNextSlide, 5000); // 5 saniyede bir geçiş
+
+
+</script>
+
+</body>
+</html>

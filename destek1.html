@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Yiğit Otomotiv - Orijinal yedek parçalar ve destek formu">
+  <link rel="icon" type="image/x-icon" href="/resim/yigit-oto/favicon.ico">
+  <title>Destek | Yiğit Otomotiv</title>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3FW3CNT4XK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-3FW3CNT4XK');
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f2f2f2;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #0c4da2;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    main {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type=text],
+    input[type=tel],
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    input[type=submit] {
+      background-color: #0c4da2;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+
+    input[type=submit]:hover {
+      background-color: #2d60a3;
+    }
+
+    footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      font-size: 14px;
+    }
+
+    footer a {
+      color: #ffcc00;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 24px;
+      }
+
+      .container {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Yiğit Otomotiv</h1>
+    <p>Orijinal yedek parçalar | İletişim ve destek formu</p>
+  </header>
+
+  <main>
+    <section class="container">
+      <h2>İletişim Formu</h2>
+      <form action="https://formspree.io/f/xwkjjgow" method="POST">
+        <label for="fullname">Ad Soyad</label>
+        <input type="text" id="fullname" name="Ad Soyad" placeholder="Ad Soyadınız" required autocomplete="name">
+
+        <label for="company">Firma İsmi</label>
+        <input type="text" id="company" name="Firma İsmi" placeholder="Firma adınız (varsa)" autocomplete="organization">
+
+        <label for="phone">Telefon</label>
+        <input type="tel" id="phone" name="Telefon" placeholder="05xxxxxxxxx" pattern="^0[0-9]{10}$" required autocomplete="tel">
+
+        <label for="message">Mesaj</label>
+        <textarea id="message" name="Mesaj" placeholder="Mesajınızı buraya yazınız..." rows="6" required></textarea>
+
+        <input type="submit" value="Gönder">
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    © 2022 - <span id="currentYear"></span> <a href="https://tuncyyldrm.vercel.app" target="_blank">Tuncay YILDIRIM</a>
+  </footer>
+
+  <script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+        .then(() => console.log('Service Worker kaydedildi.'))
+        .catch(err => console.error('Service Worker hatası:', err));
+    }
+  </script>
+</body>
+</html>

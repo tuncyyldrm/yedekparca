@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+	<link rel="icon" type="image/x-icon" href="/resim/yigit-oto/favicon.ico">
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3FW3CNT4XK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3FW3CNT4XK');
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+	<link rel="stylesheet" href="style1.css">
+    <title>Hararet Müşürü</title>
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+	<div style="flex: 1;">
+    <div class="header">
+	<div class="head-1">
+	<a href="./" class="fas fa-arrow-left" style="color:white;font-weight: bold;text-decoration: none;font-size: 24px;font-weight: bold;"></a>
+        <h1>Hararet Müşürü</h1>
+		</div>
+<div class="head-2">
+    <!-- Araç ve Kategori seçicileri ile birlikte arama kutusu ekliyoruz -->
+    <select id="vehicle-select" onchange="filterProducts()">
+        <option value="">ARAÇ</option>
+    </select>
+    <select style="display:none;" id="category-select" onchange="filterProducts()">
+        <option value="">KATEGORİ</option>
+    </select>
+    <input type="text" id="search-input" placeholder="Ürün ara..." oninput="filterProducts()" />
+    <div style="display:flex;"><label>
+        <input type="checkbox" id="new-products-checkbox" onchange="filterProducts()"> YENİ
+    </label></div>
+</div>
+<div id="qr-container" style="position:fixed;right: 10px;top: 5px;width: 70px;height: 70px;border:1px solid #ccc;background:white;z-index:1000;">
+  <img id="qr-code" src="" alt="QR Code" style="width:100%;height:auto;">
+</div>		
+    </div>
+	
+<div itemscope itemtype="https://schema.org/Product">
+	<div class="modal" id="product-modal" style="visibility: hidden;" onclick="closeModal(event)">
+		<div class="modal-content" onclick="event.stopPropagation()">
+			<span class="close" onclick="closeModal(event)">&times;</span>
+			<img itemprop="image" id="modal-image" src="" alt="">
+			<h2 id="modal-title" itemprop="name"></h2>
+			<p id="modal-araba" itemprop="additionalType"></p>
+			<p id="modal-kategori" itemprop="category"></p>
+			<p id="modal-description" itemprop="description"></p>
+			<div id="modal-additional-info"></div>
+			<div id="modal-stock-codes">
+				<p><strong>Stok Kodları:</strong> <span itemprop="sku" id="modal-sku">[Stok Kodu Buraya Gelecek]</span></p>
+			</div>
+			<div style="display: none;">
+				<!-- Offers (Fiyat ve Stok Durumu) -->
+				<div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+					<p><strong>Fiyat:</strong> <span itemprop="price" id="modal-price">0</span></p>
+					<p><strong>Para Birimi:</strong> <span itemprop="priceCurrency" id="modal-currency">TRY</span></p>
+					<p><strong>Stok Durumu:</strong> <span itemprop="availability" id="modal-stock">[Stok Durumu Buraya Gelecek]</span></p>
+				</div>
+
+				<!-- AggregateRating (Derecelendirme) -->
+				<div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+					<p><strong>Derecelendirme:</strong> <span itemprop="ratingValue" id="modal-rating">[Derecelendirme Buraya Gelecek]</span>/5</p>
+					<p><strong>Yorum Sayısı:</strong> <span itemprop="reviewCount" id="modal-review-count">1</span></p>
+				</div>
+
+				<!-- Review (Kullanıcı Yorumları) -->
+				<div itemprop="review" itemscope itemtype="https://schema.org/Review">
+					<p><strong>Yorum:</strong> <span itemprop="reviewBody" id="modal-review-body">[Yorum Buraya Gelecek]</span></p>
+					<p><strong>Yorum Yapan:</strong> <span itemprop="author" id="modal-review-author">[Yorum Yapan Buraya Gelecek]</span></p>
+				</div>
+
+
+			</div>
+		</div>
+	</div>
+</div>
+	
+    <div class="product-container" id="product-container"></div>
+	</div>
+
+<footer style="background-color: #333333;color: white;text-align: center;padding: 15px 0;position: relative;width: 100%;font-size: 14px;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);">
+  © 2022 - <span id="currentYear"></span> <a target="_blank" style="color: #ffcc00;" href="https://tuncyyldrm.vercel.app" >Tuncay YILDIRIM</a>
+</footer>
+
+<!-- JavaScript -->
+<script>
+  function toggleContactPopup() {
+    const popup = document.getElementById("contact-popup");
+    popup.style.display = (popup.style.display === "none" ? "block" : "none");
+  }
+
+  // Dinamik olarak güncel yılı gösterme
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+  // Service Worker kaydı
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('/service-worker.js', { scope: '/' })
+      .then(() => console.log('Ana dizin için Service Worker kaydedildi.'))
+      .catch(err => console.error('Service Worker kaydı başarısız:', err));
+  }
+</script>
+<script>
+    let allProducts = [];
+	let initialTitle = document.title; // Başlangıç başlığı
+
+// CSV dosyasını okuma fonksiyonu
+async function fetchCSVData() {
+    try {
+        // URL'ye timestamp parametresi ekliyoruz
+        const response = await fetch(`vt/hararetmusuru.txt?t=${new Date().getTime()}`);
+
+        // Eğer dosya bulunamazsa veya başka bir hata varsa, response.ok kontrolü yapılır
+        if (!response.ok) {
+            throw new Error('Veri dosyası yüklenemedi. Lütfen tekrar deneyin.');
+        }
+
+        // CSV dosyasını okuma
+        const csvText = await response.text();
+        
+        // CSV verisini çözümle (parse et)
+        return parseCSV(csvText);
+    } catch (error) {
+        // Kullanıcıya dostça hata mesajı gösterme
+        alert('Veri yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+        return [];  // Boş bir dizi döndür
+    }
+}
+    // CSV verisini ayrıştırma
+	function parseCSV(csvText) {
+		const lines = csvText.trim().split('\n');
+		const data = lines.map(line => {
+			const columns = line.split('\t').map(col => col.trim()); // Her sütundaki boşlukları temizliyoruz
+			return columns;
+		});
+		return data;
+	}
+
+// Ürünleri ekranda gösterme
+function displayProducts(products) {
+    const container = document.getElementById('product-container');
+    container.innerHTML = '';
+    products.forEach(product => {
+        const productDiv = document.createElement('div');
+        productDiv.className = 'product';
+        productDiv.onclick = () => openModal(product); // Ürün tıklandığında modal açılır
+
+        let statusHtml = '';
+        if (product[4] && product[4] !== 'undefined') {
+            statusHtml = `<div class="product-status">${product[4]}</div>`;
+        }
+
+        let additionalInfoHtml = '';
+        if (product[5] && product[5] !== 'undefined') {
+            additionalInfoHtml = `<div class="additional-info">${product[5]}</div>`;
+        }
+
+const stockCodes = [product[6], product[7], product[8]].filter(Boolean);
+const stockCodeHtml = stockCodes.map(code => `
+    <div class="stock-code">
+        ${code}
+        <div class="image-preview">
+				<img src="./resim/${code}.jpg" loading="lazy" alt="${code}" 
+					onerror="this.style.display='none'; 
+					this.parentElement.style.display='none'; 
+					this.parentElement.style.boxShadow='none'; 
+					this.parentElement.style.border='none';
+					this.parentElement.style.padding='0';">
+        </div> 
+    </div>
+`).join('');
+
+
+        productDiv.innerHTML = `
+            ${statusHtml}
+            <img src="./resim/${product[0]}.jpg" alt="${product[0]}" loading="lazy">
+            <h2>${product[0]}</h2>
+            <p class="additional-info">${product[1]}</p>
+            <p class="additional-kategori">${product[2]}</p>
+            <p class="aciklama">${product[3]}</p>
+            ${additionalInfoHtml}
+            <div class="product-info">${stockCodeHtml}</div>
+        `;
+        container.appendChild(productDiv);
+    });
+}
+
+// QR kodunu güncelleme fonksiyonu
+function updateQRCode() {
+  const currentUrl = window.location.origin + window.location.pathname;
+  const queryParams = window.location.search;
+  const qrData = queryParams ? `${currentUrl}${queryParams}` : currentUrl;
+  
+  document.getElementById('qr-code').src = 
+    `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(qrData)}&code=QRCode&eclevel=L`;
+}
+
+// Modal'ı açma fonksiyonu
+function openModal(product) {
+    // URL'ye ürün kimliğini ekle
+    const url = new URL(window.location);
+    url.searchParams.set('product', product[0]); // Ürün ID'sini URL'ye ekle
+    window.history.pushState({}, '', url); // URL'yi güncelle ama sayfayı yeniden yükleme
+
+    // Sayfa başlığını güncelle
+    document.title = `${initialTitle} ${product[0]}`;
+updateQRCode();
+
+    document.getElementById('product-modal').style.visibility = 'visible'; // Modalı göster
+    document.body.classList.add('modal-open'); // Kaydırmayı devre dışı bırak
+    document.getElementById('modal-image').src = `./resim/${product[0]}.jpg`;
+	document.getElementById('modal-image').title = product[0] + " " + product[3]; // Resim için başlık ekle
+	document.getElementById('modal-image').alt = product[0] + " " + product[3]; // Resim için alt metin ekle
+    document.getElementById('modal-title').textContent = product[0];
+    document.getElementById('modal-araba').textContent = product[1];
+    document.getElementById('modal-kategori').textContent = product[2];
+    document.getElementById('modal-description').textContent = product[3]; // Açıklama
+    document.getElementById('modal-additional-info').innerHTML = product[5] || ''; // Ek bilgi
+
+    // Ürün durumunu ekle
+    let statusHtml = '';
+    if (product[4] && product[4] !== 'undefined') {
+        statusHtml = `<div class="product-status">${product[4]}</div>`;
+    }
+    document.getElementById('modal-stock-codes').innerHTML = `
+        ${statusHtml}
+        ${[product[6], product[7], product[8]].filter(Boolean).map(code => `
+            <div class="stock-code"  
+                 onmouseover="showPreview(event, '${code}')" 
+                 onmouseout="hidePreview(event)">
+                ${code}
+               <div class="image-preview" id="preview-${code}">
+                <img src="./resim/${code}.jpg" loading="lazy" alt="${code}" 
+                    onerror="this.style.display='none'; 
+                    this.parentElement.style.display='none'; 
+                    this.parentElement.style.boxShadow='none'; 
+                    this.parentElement.style.border='none';
+                    this.parentElement.style.padding='0';">
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
+
+// Stok kodu üzerine gelindiğinde resmi gösterme fonksiyonu
+function showPreview(event, code) {
+    const preview = document.getElementById(`preview-${code}`);
+    if (preview) {
+        preview.style.display = 'block'; // Resmi görünür yap
+    }
+}
+// Stok kodu dışına çıkıldığında resmi gizleme fonksiyonu
+function hidePreview(event) {
+    const preview = event.currentTarget.querySelector('.image-preview');
+    if (preview) {
+        preview.style.display = 'none'; // Resmi gizle
+    }
+}
+// Modal'ı kapatma fonksiyonu
+function closeModal(event) {
+    if (event) {
+        event.stopPropagation(); // Eğer modal içeriğine tıklanmışsa, tıklamayı durdur
+    }
+    document.getElementById('product-modal').style.visibility = 'hidden'; // Modalı gizle
+    document.body.classList.remove('modal-open'); // Kaydırmayı tekrar etkinleştir
+
+    // URL'deki ürün parametresini temizle
+    const url = new URL(window.location);
+    url.searchParams.delete('product');
+    window.history.pushState({}, '', url); // URL'yi güncelle ama sayfayı yeniden yükleme
+
+    // Başlığı eski haline döndür
+    document.title = initialTitle;
+	updateQRCode();
+}
+
+// Türkçe karakterleri normalleştirme fonksiyonu
+function normalizeText(text) {
+    const turkishMap = {
+        'ç': 'c', 'Ç': 'C',
+        'ğ': 'g', 'Ğ': 'G',
+        'ı': 'i', 'İ': 'I',
+        'ö': 'o', 'Ö': 'O',
+        'ş': 's', 'Ş': 'S',
+        'ü': 'u', 'Ü': 'U'
+    };
+
+    return text.split('').map(char => {
+        return turkishMap[char] || char; // Türkçe karakter varsa karşılığını, yoksa harfi kendisini al
+    }).join('').toLowerCase(); // Tüm karakterleri birleştir ve küçük harfe çevir
+}
+function updateProductStatus(product) {
+    // Geçerli tarih
+    const currentDate = new Date();
+    // Son 30 günün tarihini hesapla
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(currentDate.getDate() - 30);
+
+    // product[4] alanı boşsa ve product[9] tarihi son 30 gün içinde ise güncelle
+    if (!product[4]) {
+        // product[9] tanımlı mı kontrol et
+        if (product[9]) {
+            const productDate = new Date(product[9].split('.').reverse().join('-')); // Tarih formatını YYYY-MM-DD'ye çevir
+            if (productDate >= thirtyDaysAgo && productDate <= currentDate) {
+                product[4] = "YENİ"; // product[4] değerini güncelle
+            } else {
+            }
+        } else {
+        }
+    }
+}
+
+
+// Ürünleri filtreleme
+function filterProducts() {
+    const selectedVehicle = normalizeText(document.getElementById('vehicle-select').value.trim());
+    const showNewProducts = document.getElementById('new-products-checkbox').checked; // Checkbox durumu
+    const selectedCategory = normalizeText(document.getElementById('category-select').value.trim());
+    const searchTerm = normalizeText(document.getElementById('search-input').value.trim()); // Arama kutusundaki metin
+
+    // Arama terimlerini kelime kelime ayır (boşluklarla böl)
+    const searchTerms = searchTerm.split(/\s+/); // Birden fazla boşluğu göz ardı et
+
+    const filteredProducts = allProducts.filter(product => {
+        const productBrand = normalizeText(product[1] ? product[1] : ""); 
+        const productVehicles = product[5] ? product[5].split(/[-,\s]+/) : []; 
+        const productExtraInfo = normalizeText(product[3] ? product[3] : ""); 
+        const productCategory = normalizeText(product[2] ? product[2] : ""); 
+
+        // Markaları '-' ve ' ' ile ayır ve bir diziye çevir
+        const brandsArray = productBrand.split(/[-,\s]+/).map(brand => normalizeText(brand.trim()));
+
+        // Araç ve kategori eşleşmesini kontrol et
+        const matchesVehicle = !selectedVehicle || 
+                               productVehicles.some(vehicle => normalizeText(vehicle) === selectedVehicle) || 
+                               productExtraInfo.includes(selectedVehicle);
+
+        const matchesBrand = !selectedVehicle || brandsArray.includes(selectedVehicle);
+        const matchesCategory = !selectedCategory || productCategory === selectedCategory;
+		
+		const matchesNewProduct = !showNewProducts || (product[4] === 'YENİ');
+
+        // Öncelik tam eşleşme
+        const matchesExactSearch = searchTerm === "" || 
+                                   product.some(field => field && normalizeText(field) === searchTerm);
+
+        // Eğer tam eşleşme bulunamazsa kelime kelime arama yap
+        const matchesPartialSearch = searchTerms.every(term => 
+            term === "" || product.some(field => field && normalizeText(field).includes(term))
+        );
+
+        // İlk önce tam eşleşmeyi kontrol et, sonra kelime kelime aramayı yap
+        const matchesSearch = matchesExactSearch || matchesPartialSearch;
+
+        return (matchesVehicle || matchesBrand) && matchesCategory && matchesNewProduct && matchesSearch;
+    });
+
+    displayProducts(filteredProducts);
+	updateURLWithFilters();
+}
+		// Kategorileri doldur
+function populateCategories() {
+    const categorySelect = document.getElementById('category-select');
+    const uniqueCategories = new Set(); // Benzersiz kategorileri saklamak için Set kullanıyoruz
+
+    // Tüm ürünler üzerinden geçiyoruz ve kategorileri topluyoruz
+    allProducts.forEach(product => {
+        const productCategory = product[2]; // Ürün kategorisini al (örnek olarak)
+        if (productCategory) {
+            uniqueCategories.add(productCategory); // Benzersiz kategoriyi ekle
+        }
+    });
+
+    // Kategorileri select elementine ekle
+    uniqueCategories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
+}
+// Araç seçeneklerini doldurma
+function populateVehicleOptions() {
+    const vehicleSelect = document.getElementById('vehicle-select');
+    const uniqueVehicles = new Set(); // Benzersiz araçları saklamak için Set kullanıyoruz
+
+    // Tüm ürünler üzerinden geçiyoruz ve araç markalarını topluyoruz
+    allProducts.forEach(product => {
+        const productVehicles = product[1]; // Ürün araçlarını al (örnek olarak)
+        if (productVehicles) {
+            // Araçları '-' ve ' ' ile ayırarak bir diziye çevir
+            const vehiclesArray = productVehicles.split(/[-,\s]+/).map(vehicle => vehicle.trim()); // Boşluk ve '-' ile ayır
+
+            // Benzersiz araçları Set'e ekle
+            vehiclesArray.forEach(vehicle => {
+                if (vehicle) { // Boş değerleri atla
+                    uniqueVehicles.add(vehicle);
+                }
+            });
+        }
+    });
+
+    // Araçları select elementine ekle
+    uniqueVehicles.forEach(vehicle => {
+        const option = document.createElement('option');
+        option.value = vehicle;
+        option.textContent = vehicle;
+        vehicleSelect.appendChild(option);
+    });
+}
+
+
+
+
+function updateURLWithFilters() {
+    const selectedCategory = document.getElementById('category-select').value;
+    const selectedVehicle = document.getElementById('vehicle-select').value;
+    const showNewProducts = document.getElementById('new-products-checkbox').checked;
+    const searchInput = document.getElementById('search-input').value.trim();
+
+    const params = new URLSearchParams();
+
+    if (selectedCategory) params.set('kategori', selectedCategory);
+    if (selectedVehicle) params.set('arac', selectedVehicle);
+    if (showNewProducts) params.set('yeni', '1');
+    if (searchInput) params.set('q', searchInput);
+
+    // SEO açısından boş "?" oluşmaması için kontrol ekleniyor
+    const queryString = params.toString();
+    const newUrl = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
+
+    window.history.replaceState({}, '', newUrl);
+}
+
+
+
+// Sayfa yüklendiğinde CSV verilerini al ve göster
+window.onload = async function() {
+    const data = await fetchCSVData();
+    allProducts = data.slice(1); // İlk satır başlık olduğu için hariç tutuluyor
+
+    updateQRCode();
+
+    allProducts.forEach(product => updateProductStatus(product));
+
+    populateCategories();
+    populateVehicleOptions();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const kategoriParam = urlParams.get('kategori');  // Kategori (category-select)
+    const markaParam = urlParams.get('marka') || urlParams.get('arac'); // Araç/marka (vehicle-select)
+    const yeniParam = urlParams.get('yeni');          // Yeni ürünler
+    const searchParam = urlParams.get('q');           // Arama
+    const productId = urlParams.get('product');       // Modal açılacak ürün
+
+    // Giriş alanlarını URL parametrelerine göre doldur
+    if (kategoriParam) {
+        document.getElementById('category-select').value = kategoriParam;
+    }
+    if (markaParam) {
+        document.getElementById('vehicle-select').value = markaParam;
+    }
+    if (yeniParam === '1' || yeniParam === 'true') {
+        document.getElementById('new-products-checkbox').checked = true;
+    }
+    if (searchParam) {
+        document.getElementById('search-input').value = searchParam;
+    }
+
+    // Filtreleme fonksiyonunu çağır (hem ekrana yaz hem URL ile uyumlu hale getir)
+    filterProducts();
+
+    // Eğer belirli ürün modal olarak açılacaksa
+    if (productId) {
+        const product = allProducts.find(p => p[0] === productId);
+        if (product) {
+            openModal(product);
+            document.title = `${initialTitle} ${productId}`;
+        }
+    }
+};
+
+</script>
+
+</body>
+</html>

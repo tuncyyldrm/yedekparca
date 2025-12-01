@@ -1,0 +1,23 @@
+# Tüm botlar için geçerli kurallar
+User-agent: *
+
+# Sipariş ve yönetim paneli gibi alanlar taranmasın
+Disallow: /siparis/admin/
+
+# Modal ürün detay URL'lerini (product parametresi olanlar) engelle
+Disallow: /*?*product=
+Disallow: /*&product=
+
+# Gerekiyorsa sadece aşağıdaki dizinlere izin ver
+Allow: /public/
+Allow: /public-google/
+
+# Belirli botlar için ek kurallar
+User-agent: Googlebot
+Allow: /public-google/
+
+User-agent: Bingbot
+Disallow: /no-bing/
+
+# Site haritası
+Sitemap: https://katalog.yigitotomotiv.com/sitemap.xml
